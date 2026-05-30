@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MathLab">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0d0d14">
+<title>MathLab — Analisi 1</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiTWF0aExhYiIsInNob3J0X25hbWUiOiJNYXRoTGFiIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZDBkMTQiLCJ0aGVtZV9jb2xvciI6IiMwZDBkMTQiLCJpY29ucyI6W119">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Fira+Code:wght@400;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0d14;--card:#16161f;--card2:#1e1e2a;--border:#2a2a3a;
+  --text:#e8e6f0;--muted:#7a7890;
+  --accent:#ff6b35;--blue:#4a90e2;--green:#3ecf8e;
+  --purple:#a78bfa;--gold:#fbbf24;--red:#f87171;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{font-size:16px;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);
+  height:100dvh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* TOPBAR */
+.topbar{background:var(--card);border-bottom:1px solid var(--border);
+  padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.app-name{font-family:'Fraunces',serif;font-size:22px;font-weight:900;color:var(--accent);}
+.top-right{display:flex;align-items:center;gap:10px;}
+.xp-badge{background:#2a1f0a;border:1px solid #5a3a10;border-radius:20px;
+  padding:5px 12px;font-size:13px;color:var(--gold);font-weight:600;}
+.streak-badge{font-size:13px;color:var(--accent);}
+
+/* SCROLL */
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:72px;}
+
+/* PANELS */
+.panel{display:none;padding:18px 16px;}
+.panel.active{display:block;animation:fu .22s ease;}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* TYPOGRAPHY */
+.sec-tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);
+  font-weight:700;margin-bottom:6px;}
+.sec-title{font-family:'Fraunces',serif;font-size:28px;font-weight:900;
+  line-height:1.1;margin-bottom:10px;}
+.sec-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:20px;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:18px;margin-bottom:14px;position:relative;overflow:hidden;}
+.card-top{position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--gold));}
+.card-title{font-weight:700;font-size:16px;margin-bottom:10px;}
+.card-body{font-size:14px;color:var(--muted);line-height:1.7;}
+
+/* ROADMAP */
+.road-card{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:14px 14px 14px 16px;margin-bottom:10px;display:flex;align-items:center;
+  gap:12px;position:relative;}
+.road-card.current{border-color:var(--accent);}
+.road-card.done{border-color:var(--green);}
+.road-card.locked{opacity:.32;}
+.road-emoji{font-size:26px;flex-shrink:0;}
+.road-info{flex:1;min-width:0;}
+.road-name{font-weight:700;font-size:15px;margin-bottom:2px;}
+.road-desc{font-size:12px;color:var(--muted);line-height:1.4;}
+.road-bar{height:3px;background:var(--border);border-radius:2px;margin-top:7px;overflow:hidden;}
+.road-fill{height:100%;border-radius:2px;}
+.fill-green{background:linear-gradient(90deg,var(--green),#3ecf8e88);}
+.fill-accent{background:linear-gradient(90deg,var(--accent),var(--gold));}
+.road-badge{position:absolute;top:9px;right:10px;font-size:9px;padding:2px 7px;
+  border-radius:7px;font-weight:700;letter-spacing:.5px;}
+.badge-curr{background:#ff6b3520;color:var(--accent);}
+.badge-done{background:#3ecf8e20;color:var(--green);}
+
+/* THEORY COMPONENTS */
+.formula{background:#0a0a10;border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;font-family:'Fira Code',monospace;font-size:15px;
+  color:var(--gold);text-align:center;margin:14px 0;line-height:1.6;}
+.analogy{background:#1a120a;border:1px solid #3a2a15;border-radius:12px;
+  padding:14px;margin:12px 0;display:flex;gap:12px;}
+.an-icon{font-size:22px;flex-shrink:0;margin-top:2px;}
+.an-text{font-size:13px;color:#b8b0a0;line-height:1.65;}
+.an-text strong{color:var(--text);}
+.step{display:flex;gap:10px;margin-bottom:11px;align-items:flex-start;}
+.step-n{width:24px;height:24px;background:var(--accent);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+  font-weight:700;flex-shrink:0;font-family:'Fira Code',monospace;margin-top:1px;}
+.step-t{font-size:13px;color:var(--muted);line-height:1.65;}
+.step-t strong{color:var(--text);}
+.step-t code{background:var(--card2);padding:1px 5px;border-radius:4px;
+  font-family:'Fira Code',monospace;font-size:12px;color:var(--accent);}
+.info-tap{background:var(--card2);border:1px solid var(--border);border-radius:10px;
+  padding:12px;font-size:13px;color:var(--muted);line-height:1.6;margin-top:10px;min-height:52px;}
+.info-tap strong{color:var(--text);}
+.numline{background:var(--card2);border-radius:12px;height:70px;position:relative;
+  overflow:hidden;margin:12px 0;}
+.nl-line{position:absolute;top:50%;left:6%;right:7%;height:2px;background:var(--border);transform:translateY(-50%);}
+.nl-arr{position:absolute;right:5%;top:50%;transform:translateY(-50%);width:0;height:0;
+  border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid var(--border);}
+.nl-pt{position:absolute;top:42%;transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;}
+.nl-dot{width:10px;height:10px;border-radius:50%;}
+.nl-lbl{font-family:'Fira Code',monospace;font-size:8px;font-weight:700;white-space:nowrap;}
+.nl-tick{position:absolute;top:50%;transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;}
+.nl-tb{width:1px;height:9px;background:var(--border);}
+.nl-tn{font-size:8px;color:var(--muted);font-family:'Fira Code',monospace;margin-top:1px;}
+.abs-wrap{background:var(--card2);border-radius:12px;padding:14px;margin:12px 0;}
+.abs-wrap label{font-size:13px;color:var(--muted);display:block;margin-bottom:10px;}
+input[type=range]{width:100%;accent-color:var(--accent);}
+.abs-res{font-family:'Fira Code',monospace;font-size:14px;color:var(--text);
+  text-align:center;margin-top:10px;background:var(--card);border-radius:10px;
+  padding:10px;border:1px solid var(--border);}
+.abs-res span{color:var(--accent);font-weight:700;font-size:17px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0;}
+.g-item{background:var(--card2);border-radius:10px;padding:12px;
+  font-size:12px;color:var(--muted);line-height:1.6;}
+.g-item strong{color:var(--text);display:block;margin-bottom:3px;
+  font-family:'Fira Code',monospace;font-size:13px;}
+.g-item.highlight{border:1px solid #ff6b3540;background:#1a0d07;}
+.g-item.highlight strong{color:var(--accent);}
+.highlight-box{background:#0f1a2a;border:1px solid #1e3a60;border-radius:12px;
+  padding:14px;margin:12px 0;font-size:13px;color:#8aaecc;line-height:1.7;}
+.highlight-box strong{color:var(--blue);}
+
+/* lesson nav buttons */
+.lesson-nav{display:flex;gap:10px;margin-top:18px;}
+.ln-btn{flex:1;padding:13px;border-radius:12px;border:none;font-family:'Outfit',sans-serif;
+  font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;}
+.ln-primary{background:var(--accent);color:white;}
+.ln-primary:active{background:#d4501f;}
+.ln-ghost{background:var(--card2);color:var(--muted);border:1px solid var(--border);}
+
+/* lesson selector */
+.lesson-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.lesson-item{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;
+  transition:all .15s;}
+.lesson-item:active{background:var(--card2);}
+.lesson-item.active{border-color:var(--accent);}
+.lesson-item.done{border-color:var(--green);}
+.li-icon{font-size:20px;flex-shrink:0;}
+.li-info{flex:1;}
+.li-title{font-size:14px;font-weight:600;margin-bottom:2px;}
+.li-sub{font-size:12px;color:var(--muted);}
+.li-status{font-size:16px;}
+
+/* EXERCISES */
+.diff-row{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;
+  padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+.diff-row::-webkit-scrollbar{display:none;}
+.diff-chip{padding:8px 15px;border-radius:20px;border:1.5px solid var(--border);
+  background:var(--card);font-size:13px;font-weight:600;cursor:pointer;
+  white-space:nowrap;flex-shrink:0;color:var(--muted);transition:all .15s;}
+.diff-chip.s-easy{border-color:var(--green);color:var(--green);background:#0d2a1e;}
+.diff-chip.s-med{border-color:var(--gold);color:var(--gold);background:#2a1f0a;}
+.diff-chip.s-hard{border-color:var(--red);color:var(--red);background:#2a0f0f;}
+.diff-chip.s-chal{border-color:var(--purple);color:var(--purple);background:#1e1430;}
+.topic-sel{width:100%;background:var(--card);border:1.5px solid var(--border);
+  border-radius:12px;padding:11px 14px;color:var(--text);font-family:'Outfit',sans-serif;
+  font-size:14px;margin-bottom:12px;outline:none;-webkit-appearance:none;}
+.topic-sel:focus{border-color:var(--accent);}
+.gen-btn{width:100%;padding:14px;background:var(--accent);color:white;border:none;
+  border-radius:12px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;
+  cursor:pointer;margin-bottom:18px;display:flex;align-items:center;
+  justify-content:center;gap:8px;transition:all .15s;}
+.gen-btn:active{background:#d4501f;transform:scale(.98);}
+.gen-btn:disabled{opacity:.5;}
+.ex-card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:12px;
+  border-left:4px solid var(--border);}
+.ex-card.easy{border-left-color:var(--green);}
+.ex-card.medium{border-left-color:var(--gold);}
+.ex-card.hard{border-left-color:var(--red);}
+.ex-card.challenge{border-left-color:var(--purple);}
+.ex-badge{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  margin-bottom:9px;display:inline-block;}
+.ex-badge.easy{color:var(--green);}
+.ex-badge.medium{color:var(--gold);}
+.ex-badge.hard{color:var(--red);}
+.ex-badge.challenge{color:var(--purple);}
+.ex-q{font-size:15px;font-family:'Fira Code',monospace;color:var(--text);
+  line-height:1.5;margin-bottom:11px;}
+.hint-toggle{font-size:12px;color:var(--blue);cursor:pointer;margin-bottom:9px;display:inline-block;}
+.hint-box{font-size:13px;color:var(--muted);background:#0f1a2a;border:1px solid #1e3050;
+  border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.6;display:none;}
+.hint-box.show{display:block;}
+.ex-input{width:100%;background:var(--card2);border:1.5px solid var(--border);
+  border-radius:10px;padding:12px 14px;font-family:'Fira Code',monospace;font-size:14px;
+  color:var(--text);outline:none;margin-bottom:9px;-webkit-appearance:none;}
+.ex-input:focus{border-color:var(--accent);}
+.ex-verify{width:100%;padding:12px;background:var(--card2);border:1.5px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;
+  font-weight:700;cursor:pointer;transition:all .15s;}
+.ex-verify:active{background:var(--accent);border-color:var(--accent);color:white;}
+.ex-fb{margin-top:9px;border-radius:10px;padding:12px;font-size:13px;
+  line-height:1.65;display:none;}
+.ex-fb.ok{background:#0d2a1e;border:1px solid #1a5a38;color:#7dd8aa;display:block;}
+.ex-fb.ko{background:#2a0f0f;border:1px solid #5a2020;color:#f8a0a0;display:block;}
+.load-area{text-align:center;padding:32px 0;display:none;}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);
+  border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-area p{color:var(--muted);font-size:13px;}
+.ex-ph{text-align:center;padding:36px 16px;color:var(--muted);}
+.ex-ph .big{font-size:38px;margin-bottom:10px;}
+.ex-ph p{font-size:14px;}
+
+/* QUIZ */
+.quiz-prog{height:5px;background:var(--border);border-radius:3px;margin-bottom:18px;overflow:hidden;}
+.quiz-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));
+  border-radius:3px;transition:width .4s;}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:14px;}
+.q-meta{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;}
+.q-text{font-family:'Fraunces',serif;font-size:20px;font-weight:700;line-height:1.35;margin-bottom:18px;}
+.q-opts{display:flex;flex-direction:column;gap:9px;}
+.q-opt{display:flex;align-items:center;gap:11px;padding:13px 14px;
+  border:1.5px solid var(--border);border-radius:12px;cursor:pointer;font-size:14px;
+  color:var(--muted);background:var(--card2);transition:all .15s;}
+.q-opt:active{background:#1e1e30;}
+.q-opt.sel{border-color:var(--blue);color:var(--text);background:#0f1a2a;}
+.q-opt.ok{border-color:var(--green);color:var(--green);background:#0d2a1e;}
+.q-opt.ko{border-color:var(--red);color:var(--red);background:#2a0f0f;}
+.q-letter{width:26px;height:26px;border-radius:50%;border:1.5px solid currentColor;
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+  font-weight:700;flex-shrink:0;font-family:'Fira Code',monospace;}
+.q-explain{margin-top:13px;padding:13px;background:var(--card2);border-radius:10px;
+  font-size:13px;color:var(--muted);line-height:1.7;border:1px solid var(--border);display:none;}
+.q-explain.show{display:block;}
+.q-explain strong{color:var(--green);}
+.q-nav{display:flex;gap:10px;margin-top:14px;}
+.q-btn{flex:1;padding:13px;border-radius:12px;border:none;font-family:'Outfit',sans-serif;
+  font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;}
+.q-btn.primary{background:var(--accent);color:white;}
+.q-btn.primary:active{background:#d4501f;}
+.q-btn.primary:disabled{opacity:.4;}
+.q-btn.ghost{background:var(--card2);color:var(--muted);border:1px solid var(--border);}
+.score-box{background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:40px 20px;text-align:center;display:none;margin-bottom:20px;}
+.score-box.show{display:block;}
+.score-num{font-family:'Fraunces',serif;font-size:72px;font-weight:900;color:var(--accent);line-height:1;}
+.score-stars{font-size:36px;margin:12px 0 6px;}
+.score-msg{font-size:15px;color:var(--muted);}
+.retry-btn{margin-top:22px;width:100%;padding:14px;background:var(--accent);color:white;
+  border:none;border-radius:12px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;}
+
+/* TUTOR */
+.tutor-top{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:14px;display:flex;gap:12px;align-items:flex-start;margin-bottom:14px;}
+.t-av{width:38px;height:38px;background:#1e1e30;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.t-name{font-weight:700;font-size:14px;margin-bottom:2px;}
+.t-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+.chat-hist{display:flex;flex-direction:column;gap:11px;margin-bottom:12px;
+  max-height:40dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.cmsg{display:flex;gap:8px;align-items:flex-end;}
+.cmsg.user{flex-direction:row-reverse;}
+.cav{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;
+  justify-content:center;font-size:13px;flex-shrink:0;}
+.cav.ai{background:#1e1e30;}
+.cav.user{background:var(--accent);}
+.cbub{max-width:84%;padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.65;}
+.cbub.ai{background:var(--card);border:1px solid var(--border);color:var(--muted);
+  border-bottom-left-radius:4px;}
+.cbub.user{background:var(--accent);color:white;border-bottom-right-radius:4px;}
+.chat-row{display:flex;gap:9px;align-items:flex-end;}
+.chat-in{flex:1;background:var(--card);border:1.5px solid var(--border);border-radius:12px;
+  padding:11px 14px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--text);
+  outline:none;resize:none;-webkit-appearance:none;}
+.chat-in:focus{border-color:var(--accent);}
+.chat-send{width:42px;height:42px;background:var(--accent);border:none;border-radius:12px;
+  font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;color:white;}
+.chat-send:active{background:#d4501f;}
+.chat-send:disabled{opacity:.4;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;}
+.stat-val{font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:var(--accent);}
+.stat-label{font-size:12px;color:var(--muted);margin-top:2px;}
+.stat-card.full{grid-column:1/-1;}
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.prog-label{font-size:13px;font-weight:600;flex:1;}
+.prog-pct{font-size:12px;color:var(--muted);font-family:'Fira Code',monospace;width:34px;text-align:right;}
+.prog-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;flex:2;}
+.prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--gold));}
+.prog-fill.g{background:linear-gradient(90deg,var(--green),#3ecf8e88);}
+
+/* BOTTOM NAV */
+.bnav{background:var(--card);border-top:1px solid var(--border);display:flex;flex-shrink:0;
+  padding-bottom:env(safe-area-inset-bottom,0px);}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:10px 4px 8px;cursor:pointer;gap:3px;border:none;background:transparent;
+  color:var(--muted);font-family:'Outfit',sans-serif;transition:all .15s;}
+.nb.active{color:var(--accent);}
+.nb-icon{font-size:20px;}
+.nb-label{font-size:10px;font-weight:600;letter-spacing:.3px;}
+
+/* INSTALL BANNER */
+.install-banner{background:linear-gradient(135deg,#1a0d07,#2a1506);
+  border:1px solid var(--accent);border-radius:14px;padding:16px;margin-bottom:16px;
+  display:flex;gap:14px;align-items:center;}
+.ib-icon{font-size:32px;flex-shrink:0;}
+.ib-text{flex:1;}
+.ib-title{font-weight:700;font-size:15px;margin-bottom:4px;color:var(--accent);}
+.ib-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+.ib-btn{padding:9px 16px;background:var(--accent);color:white;border:none;
+  border-radius:10px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.ib-btn:active{background:#d4501f;}
+
+::-webkit-scrollbar{display:none;}
+/* CAMERA */
+.cam-upload-area{background:var(--card);border:2px dashed var(--border);border-radius:16px;
+  padding:36px 20px;text-align:center;cursor:pointer;margin-bottom:14px;transition:all .2s;}
+.cam-upload-area:active{border-color:var(--accent);background:var(--card2);}
+.cam-icon{font-size:42px;margin-bottom:10px;}
+.cam-upload-title{font-weight:700;font-size:16px;margin-bottom:4px;}
+.cam-upload-sub{font-size:13px;color:var(--muted);}
+.correction-card{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:18px;margin-bottom:14px;}
+.correction-card.ok{border-color:var(--green);}
+.correction-card.ko{border-color:var(--red);}
+.correction-card.warn{border-color:var(--gold);}
+.corr-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.corr-icon{font-size:22px;}
+.corr-title{font-weight:700;font-size:15px;}
+.corr-body{font-size:13px;color:var(--muted);line-height:1.7;}
+.corr-body strong{color:var(--text);}
+.corr-step{background:var(--card2);border-radius:10px;padding:10px 12px;
+  margin-top:10px;font-size:13px;color:var(--muted);line-height:1.65;
+  border-left:3px solid var(--border);}
+.corr-step.ok{border-left-color:var(--green);color:#7dd8aa;}
+.corr-step.ko{border-left-color:var(--red);color:#f8a0a0;}
+.corr-step.note{border-left-color:var(--gold);color:#fcd57a;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="app-name">MathLab</div>
+  <div class="top-right">
+    <div class="streak-badge" id="streak-display">🔥 0</div>
+    <div class="xp-badge" id="xp-display">⭐ 0 XP</div>
+  </div>
+</div>
+
+<div class="scroll" id="main-scroll">
+
+<!-- ═══ HOME / ROADMAP ═══ -->
+<div class="panel active" id="panel-home">
+  <div id="install-banner" class="install-banner" style="display:none">
+    <div class="ib-icon">📲</div>
+    <div class="ib-text">
+      <div class="ib-title">Aggiungi alla schermata home</div>
+      <div class="ib-desc">Usa MathLab come un'app — anche offline.</div>
+    </div>
+    <button class="ib-btn" onclick="doInstall()">Installa</button>
+  </div>
+  <div id="ios-banner" class="install-banner" style="display:none">
+    <div class="ib-icon">📲</div>
+    <div class="ib-text">
+      <div class="ib-title">Aggiungi alla schermata home</div>
+      <div class="ib-desc">Tocca <strong style="color:var(--accent)">Condividi</strong> (⬆️) in Safari → <strong style="color:var(--accent)">Aggiungi a Home</strong></div>
+    </div>
+    <button class="ib-btn" onclick="document.getElementById('ios-banner').style.display='none'">Ok</button>
+  </div>
+
+  <div class="sec-tag">Il tuo percorso</div>
+  <div class="sec-title">Verso Analisi 1</div>
+  <div class="sec-sub">8 moduli in sequenza. Completa teoria + esercizi + quiz per sbloccare il successivo.</div>
+
+  <div id="roadmap-list"></div>
+</div>
+
+<!-- ═══ TEORIA ═══ -->
+<div class="panel" id="panel-theory">
+  <div id="theory-content"></div>
+</div>
+
+<!-- ═══ ESERCIZI ═══ -->
+<div class="panel" id="panel-exercises">
+  <div class="sec-tag">Esercizi</div>
+  <div class="sec-title">Pratica ∞</div>
+  <div class="sec-sub">Esercizi generati da AI — ogni serie è diversa. Fanne quanti vuoi.</div>
+
+  <select class="topic-sel" id="topic-sel">
+    <option value="insiemi">Modulo 1 — Insiemi numerici</option>
+    <option value="algebra">Modulo 2 — Algebra di base</option>
+    <option value="funzioni">Modulo 3 — Funzioni</option>
+    <option value="funzioni-elem">Modulo 4 — Funzioni elementari</option>
+    <option value="limiti">Modulo 5 — Limiti e Continuità</option>
+    <option value="derivate">Modulo 6 — Derivate</option>
+    <option value="integrali">Modulo 7 — Integrali</option>
+    <option value="serie">Modulo 8 — Serie numeriche</option>
+  </select>
+
+  <div class="diff-row">
+    <div class="diff-chip s-easy" id="ch-easy" onclick="setDiff('easy')">🟢 Facile</div>
+    <div class="diff-chip" id="ch-med" onclick="setDiff('medium')">🟡 Intermedio</div>
+    <div class="diff-chip" id="ch-hard" onclick="setDiff('hard')">🔴 Avanzato</div>
+    <div class="diff-chip" id="ch-chal" onclick="setDiff('challenge')">🟣 Sfida</div>
+  </div>
+
+  <button class="gen-btn" id="gen-btn" onclick="genExercises()">✦ Genera 4 esercizi</button>
+
+  <div class="load-area" id="ex-load"><div class="spinner"></div><p>Genero gli esercizi…</p></div>
+  <div class="ex-ph" id="ex-ph"><div class="big">✏️</div><p>Scegli argomento, livello e premi il pulsante</p></div>
+  <div id="ex-list"></div>
+</div>
+
+<!-- ═══ QUIZ ═══ -->
+<div class="panel" id="panel-quiz">
+  <div class="sec-tag">Quiz</div>
+  <div class="sec-title" id="quiz-title">Quiz — Modulo 1</div>
+  <div class="sec-sub">Rispondi a tutte le domande. Serve il 60% per sbloccare il modulo successivo.</div>
+  <div class="quiz-prog"><div class="quiz-prog-fill" id="qprog" style="width:0%"></div></div>
+  <div id="qcontainer"></div>
+  <div class="score-box" id="score-box">
+    <div class="score-num" id="sc-n"></div>
+    <div class="score-stars" id="sc-s"></div>
+    <div class="score-msg" id="sc-m"></div>
+    <button class="retry-btn" onclick="retryQuiz()">↩ Riprova</button>
+  </div>
+</div>
+
+<!-- ═══ TUTOR ═══ -->
+<div class="panel" id="panel-tutor">
+  <div class="sec-tag">Tutor AI</div>
+  <div class="sec-title">Chiedi tutto</div>
+  <div class="sec-sub">Non hai capito qualcosa? Hai sbagliato un esercizio? Scrivi qui — rispondo in italiano, semplice.</div>
+  <div class="tutor-top">
+    <div class="t-av">🧮</div>
+    <div><div class="t-name">Tutor MathLab</div>
+    <div class="t-desc">Spiego semplice, con esempi concreti. Niente gergo inutile.</div></div>
+  </div>
+  <div class="chat-hist" id="chat-hist">
+    <div class="cmsg ai"><div class="cav ai">🧮</div>
+    <div class="cbub ai">Ciao! Su cosa hai dubbi? Puoi chiedermi qualsiasi cosa — dagli insiemi ai limiti alle serie.</div></div>
+  </div>
+  <div class="chat-row">
+    <textarea class="chat-in" id="chat-in" rows="2" placeholder="Scrivi la tua domanda…"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"></textarea>
+    <button class="chat-send" id="cs-btn" onclick="sendMsg()">↑</button>
+  </div>
+</div>
+
+<!-- ═══ STATISTICHE ═══ -->
+<div class="panel" id="panel-stats">
+  <div class="sec-tag">Le tue statistiche</div>
+  <div class="sec-title">Progresso</div>
+  <div class="sec-sub">Tieni traccia di tutto quello che hai fatto.</div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val" id="st-xp">0</div><div class="stat-label">⭐ Punti XP</div></div>
+    <div class="stat-card"><div class="stat-val" id="st-streak">0</div><div class="stat-label">🔥 Giorni streak</div></div>
+    <div class="stat-card"><div class="stat-val" id="st-ex">0</div><div class="stat-label">✏️ Esercizi completati</div></div>
+    <div class="stat-card"><div class="stat-val" id="st-cor">0%</div><div class="stat-label">🎯 Tasso correttezza</div></div>
+    <div class="stat-card full">
+      <div class="card-title" style="margin-bottom:14px">Progressione moduli</div>
+      <div id="mod-progress"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FOTOCAMERA / CORREZIONE ═══ -->
+<div class="panel" id="panel-camera">
+  <div class="sec-tag">Correzione AI</div>
+  <div class="sec-title">Fotografa il foglio</div>
+  <div class="sec-sub">Scrivi l'esercizio su carta, scatta una foto e l'AI corregge ogni passaggio — dicendoti esattamente dove hai sbagliato e perché.</div>
+
+  <!-- UPLOAD AREA -->
+  <div class="cam-upload-area" id="cam-upload-area" onclick="triggerCamera()">
+    <div class="cam-icon">📷</div>
+    <div class="cam-upload-title">Tocca per scattare o caricare</div>
+    <div class="cam-upload-sub">Foto del foglio con il tuo svolgimento</div>
+    <input type="file" id="cam-input" accept="image/*" capture="environment" style="display:none" onchange="onImageSelected(event)">
+  </div>
+
+  <!-- PREVIEW -->
+  <div id="cam-preview-wrap" style="display:none">
+    <img id="cam-preview" style="width:100%;border-radius:14px;border:1px solid var(--border);margin-bottom:14px;display:block;">
+    <div style="display:flex;gap:10px;margin-bottom:14px;">
+      <button class="ln-btn ln-ghost" style="flex:1" onclick="resetCamera()">↩ Altra foto</button>
+      <button class="ln-btn ln-primary" style="flex:1" id="cam-analyze-btn" onclick="analyzeImage()">🔍 Analizza</button>
+    </div>
+  </div>
+
+  <!-- CONTEXT INPUT -->
+  <div id="cam-context-wrap" style="display:none;margin-bottom:14px;">
+    <div style="font-size:13px;color:var(--muted);margin-bottom:8px;">Aiuta l'AI — descrivi brevemente l'esercizio (opzionale):</div>
+    <textarea id="cam-context" class="chat-in" rows="2" placeholder="Es: equazione di 2° grado, integrale per parti, limite con forma indeterminata…"></textarea>
+  </div>
+
+  <!-- LOADING -->
+  <div class="load-area" id="cam-load" style="display:none">
+    <div class="spinner"></div>
+    <p>Analizzo il tuo svolgimento…</p>
+  </div>
+
+  <!-- RESULT -->
+  <div id="cam-result"></div>
+</div>
+
+</div><!-- scroll -->
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="nb active" id="nb-home" onclick="goP('home')">
+    <span class="nb-icon">🗺️</span><span class="nb-label">Percorso</span>
+  </button>
+  <button class="nb" id="nb-theory" onclick="goP('theory')">
+    <span class="nb-icon">📐</span><span class="nb-label">Teoria</span>
+  </button>
+  <button class="nb" id="nb-exercises" onclick="goP('exercises')">
+    <span class="nb-icon">✏️</span><span class="nb-label">Esercizi</span>
+  </button>
+  <button class="nb" id="nb-quiz" onclick="goP('quiz')">
+    <span class="nb-icon">🧠</span><span class="nb-label">Quiz</span>
+  </button>
+  <button class="nb" id="nb-tutor" onclick="goP('tutor')">
+    <span class="nb-icon">💬</span><span class="nb-label">Tutor</span>
+  </button>
+  <button class="nb" id="nb-camera" onclick="goP('camera')">
+    <span class="nb-icon">📷</span><span class="nb-label">Correggi</span>
+  </button>
+  <button class="nb" id="nb-stats" onclick="goP('stats')">
+    <span class="nb-icon">📊</span><span class="nb-label">Stats</span>
+  </button>
+</nav>
+
+<script>
+// ═══════════════════════════════════════
+// STATE — persisted in localStorage
+// ═══════════════════════════════════════
+const DEFAULT_STATE = {
+  xp: 0, streak: 0, lastDate: null,
+  exDone: 0, exCorrect: 0,
+  modules: [
+    {id:0,name:'Insiemi numerici',emoji:'🔢',lessons:['Gli insiemi ℕ,ℤ,ℚ,ℝ','Valore assoluto','Disuguaglianze','Sup e inf'],done:[],quizDone:false,quizScore:0,pct:0},
+    {id:1,name:'Algebra di base',emoji:'📐',lessons:['Polinomi','Equazioni 1° grado','Equazioni 2° grado','Sistemi lineari','Disequazioni','Radicali'],done:[],quizDone:false,quizScore:0,pct:0},
+    {id:2,name:'Funzioni',emoji:'📈',lessons:['Definizione e grafico','Dominio e codominio','Iniettiva e suriettiva','Funzione inversa','Funzioni composte'],done:[],quizDone:false,quizScore:0,pct:0},
+    {id:3,name:'Funzioni elementari',emoji:'📉',lessons:['Potenze e radici','Funzione esponenziale','Funzione logaritmo','Seno e coseno','Tangente e inverse','Funzioni iperboliche'],done:[],quizDone:false,quizScore:0,pct:0},
+    {id:4,name:'Limiti e Continuità',emoji:'〰️',lessons:['Definizione ε-δ','Algebra dei limiti','Forme indeterminate','Limiti notevoli','Continuità','Teoremi'],done:[],quizDone:false,quizScore:0,pct:0},
+    {id:5,name:'Derivate',emoji:'∂',lessons:['Definizione','Regole base','Regola della catena','Teorema di Rolle','Teorema di Lagrange','De l\'Hôpital','Ottimizzazione'],done:[],quizDone:false,quizScore:0,pct:0},
+    {id:6,name:'Integrali',emoji:'∫',lessons:['Integrale indefinito','Tecniche di integrazione','Integrale definito','Teorema fondamentale','Applicazioni'],done:[],quizDone:false,quizScore:0,pct:0},
+    {id:7,name:'Serie numeriche',emoji:'∑',lessons:['Successioni','Convergenza','Criteri','Serie di Taylor','Serie di McLaurin'],done:[],quizDone:false,quizScore:0,pct:0}
+  ]
+};
+
+let S;
+try { S = JSON.parse(localStorage.getItem('mathlab_v2')) || JSON.parse(JSON.stringify(DEFAULT_STATE)); }
+catch(e){ S = JSON.parse(JSON.stringify(DEFAULT_STATE)); }
+
+function save(){ localStorage.setItem('mathlab_v2', JSON.stringify(S)); }
+
+function addXP(n){
+  S.xp += n;
+  updateTopBar();
+  save();
+}
+
+function updateTopBar(){
+  document.getElementById('xp-display').textContent = '⭐ '+S.xp+' XP';
+  document.getElementById('streak-display').textContent = '🔥 '+S.streak;
+}
+
+// ═══════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════
+function goP(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.getElementById('nb-'+id).classList.add('active');
+  document.getElementById('main-scroll').scrollTop=0;
+  if(id==='home') renderRoadmap();
+  if(id==='theory') renderTheory();
+  if(id==='stats') renderStats();
+  if(id==='quiz') renderQuizMenu();
+}
+
+// ═══════════════════════════════════════
+// ROADMAP
+// ═══════════════════════════════════════
+function isModuleUnlocked(i){
+  if(i===0) return true;
+  const prev = S.modules[i-1];
+  return prev.quizDone && prev.quizScore >= 3;
+}
+
+function renderRoadmap(){
+  const el = document.getElementById('roadmap-list');
+  el.innerHTML = '';
+  S.modules.forEach((m,i)=>{
+    const unlocked = isModuleUnlocked(i);
+    const pct = m.pct;
+    const div = document.createElement('div');
+    div.className = 'road-card' + (m.quizDone?' done':'') + (!unlocked?' locked':'') + (i===currentModule&&unlocked?' current':'');
+    const fillCls = m.quizDone ? 'fill-green' : 'fill-accent';
+    let badge = '';
+    if(!unlocked) badge = '<span class="road-badge" style="background:#2a2a3a;color:var(--muted)">🔒</span>';
+    else if(m.quizDone) badge = '<span class="road-badge badge-done">✓ OK</span>';
+    else if(i===currentModule) badge = '<span class="road-badge badge-curr">▶ IN CORSO</span>';
+    div.innerHTML = `${badge}<div class="road-emoji">${m.emoji}</div>
+      <div class="road-info">
+        <div class="road-name">${m.name}</div>
+        <div class="road-desc">${m.lessons.length} lezioni · esercizi ∞</div>
+        <div class="road-bar"><div class="road-fill ${fillCls}" style="width:${pct}%"></div></div>
+      </div>`;
+    if(unlocked) div.onclick = ()=>{ currentModule=i; goP('theory'); };
+    el.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════
+// THEORY CONTENT DATABASE
+// ═══════════════════════════════════════
+let currentModule = 0;
+let currentLesson = 0;
+
+const THEORY = {
+  // MOD 0 — INSIEMI
+  '0-0': ()=>`
+    <div class="sec-tag">Modulo 1 · Lezione 1</div>
+    <div class="sec-title">Gli insiemi numerici</div>
+    <div class="sec-sub">Dove vivono i numeri? La matematica ha costruito famiglie di numeri una per volta.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="card-title">📦 Pensa a delle scatole cinesi</div>
+    <div class="analogy"><div class="an-icon">🪆</div>
+    <div class="an-text">Immagina scatole che si incastrano. La più piccola ha i numeri del <strong>conteggio</strong>. Quella dopo aggiunge i <strong>negativi</strong>. Quella dopo le <strong>frazioni</strong>. L'ultima — ℝ — non ha buchi.</div></div>
+    <div class="formula">ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ</div>
+    <div class="card-body">⊂ significa "è contenuto in" — ogni insieme sta dentro quello più grande.</div></div>
+    <div class="card"><div class="card-top"></div>
+    <div class="card-title">🎯 Tocca un insieme</div>
+    <svg viewBox="0 0 310 165" style="width:100%;display:block;margin:8px auto">
+      <ellipse cx="155" cy="82" rx="148" ry="76" fill="#1a120a" stroke="#e07c39" stroke-width="2" style="cursor:pointer" onclick="tapS('R')"/>
+      <text x="12" y="22" font-family="Fira Code" font-size="15" font-weight="bold" fill="#e07c39" onclick="tapS('R')" style="cursor:pointer">ℝ</text>
+      <ellipse cx="151" cy="84" rx="110" ry="57" fill="#0d2a1e" stroke="#3ecf8e" stroke-width="2" style="cursor:pointer" onclick="tapS('Q')"/>
+      <text x="48" y="36" font-family="Fira Code" font-size="13" font-weight="bold" fill="#3ecf8e" onclick="tapS('Q')" style="cursor:pointer">ℚ</text>
+      <ellipse cx="147" cy="86" rx="74" ry="40" fill="#0f1a2a" stroke="#4a90e2" stroke-width="2" style="cursor:pointer" onclick="tapS('Z')"/>
+      <text x="84" y="54" font-family="Fira Code" font-size="12" font-weight="bold" fill="#4a90e2" onclick="tapS('Z')" style="cursor:pointer">ℤ</text>
+      <ellipse cx="143" cy="88" rx="42" ry="25" fill="#1e1430" stroke="#a78bfa" stroke-width="2" style="cursor:pointer" onclick="tapS('N')"/>
+      <text x="122" y="80" font-family="Fira Code" font-size="11" font-weight="bold" fill="#a78bfa" onclick="tapS('N')" style="cursor:pointer">ℕ</text>
+      <text x="128" y="92" font-family="Fira Code" font-size="8" fill="#a78bfa">0,1,2…</text>
+      <text x="88" y="108" font-family="Fira Code" font-size="8" fill="#4a90e2">−3,−1</text>
+      <text x="46" y="120" font-family="Fira Code" font-size="8" fill="#3ecf8e">½,¾</text>
+      <text x="8" y="107" font-family="Fira Code" font-size="8" fill="#e07c39">√2,π</text>
+    </svg>
+    <div class="info-tap" id="set-info">Tocca uno degli insiemi nel diagramma.</div></div>
+    <div class="card"><div class="card-top"></div>
+    <div class="card-title">📏 Tocca i punti sulla retta</div>
+    <div class="numline">
+      <div class="nl-line"></div><div class="nl-arr"></div>
+      <div class="nl-tick" style="left:12%"><div class="nl-tb"></div><div class="nl-tn">−3</div></div>
+      <div class="nl-tick" style="left:30%"><div class="nl-tb"></div><div class="nl-tn">−1</div></div>
+      <div class="nl-tick" style="left:44%"><div class="nl-tb"></div><div class="nl-tn">0</div></div>
+      <div class="nl-tick" style="left:56%"><div class="nl-tb"></div><div class="nl-tn">1</div></div>
+      <div class="nl-tick" style="left:67%"><div class="nl-tb"></div><div class="nl-tn">√2</div></div>
+      <div class="nl-tick" style="left:78%"><div class="nl-tb"></div><div class="nl-tn">π</div></div>
+      <div class="nl-pt" style="left:12%;top:38%" onclick="nlI('−3 ∈ ℤ: intero negativo. Non in ℕ.','#4a90e2')"><div class="nl-dot" style="background:#4a90e2"></div><div class="nl-lbl" style="color:#4a90e2">ℤ</div></div>
+      <div class="nl-pt" style="left:30%;top:38%" onclick="nlI('−½ ∈ ℚ: frazione negativa.','#3ecf8e')"><div class="nl-dot" style="background:#3ecf8e"></div><div class="nl-lbl" style="color:#3ecf8e">ℚ</div></div>
+      <div class="nl-pt" style="left:44%;top:38%" onclick="nlI('0 ∈ ℕ: primo numero naturale.','#a78bfa')"><div class="nl-dot" style="background:#a78bfa"></div><div class="nl-lbl" style="color:#a78bfa">ℕ</div></div>
+      <div class="nl-pt" style="left:56%;top:38%" onclick="nlI('1 ∈ ℕ: naturale, quindi anche ℤ, ℚ, ℝ.','#a78bfa')"><div class="nl-dot" style="background:#a78bfa"></div><div class="nl-lbl" style="color:#a78bfa">ℕ</div></div>
+      <div class="nl-pt" style="left:67%;top:38%" onclick="nlI('√2 ≈ 1.414… ∈ ℝ ma ∉ ℚ — irrazionale!','#e07c39')"><div class="nl-dot" style="background:#e07c39"></div><div class="nl-lbl" style="color:#e07c39">ℝ\ℚ</div></div>
+      <div class="nl-pt" style="left:78%;top:38%" onclick="nlI('π ≈ 3.14159… ∈ ℝ ma ∉ ℚ — irrazionale!','#e07c39')"><div class="nl-dot" style="background:#e07c39"></div><div class="nl-lbl" style="color:#e07c39">ℝ\ℚ</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);text-align:center" id="nl-info">↑ Tocca un punto</div></div>`,
+
+  '0-1': ()=>`
+    <div class="sec-tag">Modulo 1 · Lezione 2</div>
+    <div class="sec-title">Valore assoluto</div>
+    <div class="sec-sub">|x| è la distanza di x da zero sulla retta reale. Sempre positivo.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">📏</div>
+    <div class="an-text"><strong>|x| = distanza di x da zero.</strong> Non importa la direzione: |−7| = 7 e |7| = 7, perché entrambi sono a 7 passi dallo zero.</div></div>
+    <div class="formula">|x| = x &nbsp; se x ≥ 0<br>|x| = −x &nbsp; se x &lt; 0</div>
+    <div class="abs-wrap"><label>Trascina per vedere |x| in tempo reale:</label>
+    <input type="range" min="-10" max="10" value="4" step="0.5" id="abs-sl" oninput="updAbs()">
+    <div class="abs-res">x = <span id="ax">4</span> &nbsp;→&nbsp; |x| = <span id="av">4</span></div></div></div>
+    <div class="card"><div class="card-top"></div>
+    <div class="card-title">Le 3 forme fondamentali</div>
+    <div class="step"><div class="step-n">1</div><div class="step-t"><strong>|x − a| &lt; r</strong><br>x è a meno di r da a → <code>x ∈ (a−r, a+r)</code></div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t"><strong>|x − a| ≤ r</strong><br>→ <code>x ∈ [a−r, a+r]</code> (chiuso)</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t"><strong>|x − a| > r</strong><br>→ <code>x ∈ (−∞, a−r) ∪ (a+r, +∞)</code></div></div>
+    <div class="highlight-box">💡 <strong>Trucco:</strong> |x − 3| &lt; 2 → "x è a meno di 2 da 3" → x ∈ (1, 5). Visualizzalo sempre come una distanza!</div></div>`,
+
+  '0-2': ()=>`
+    <div class="sec-tag">Modulo 1 · Lezione 3</div>
+    <div class="sec-title">Disuguaglianze</div>
+    <div class="sec-sub">Come risolvere x² &lt; 9, disequazioni con valore assoluto e sistemi di disequazioni.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="card-title">Regole base</div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">Se moltiplichi/dividi per un <strong>numero negativo</strong>, il verso cambia: −2x > 4 → x &lt; −2</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">Per <strong>x² &lt; a²</strong>: equivale a |x| &lt; a → <code>−a &lt; x &lt; a</code></div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">Per <strong>x² > a²</strong>: equivale a |x| > a → <code>x &lt; −a oppure x > a</code></div></div></div>
+    <div class="card"><div class="card-top"></div>
+    <div class="card-title">Esempio: x² &lt; 9</div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">x² &lt; 9 = x² &lt; 3²</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">Equivale a |x| &lt; 3</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">→ <code>−3 &lt; x &lt; 3</code> → x ∈ (−3, 3)</div></div>
+    <div class="formula">x² &lt; 9 ↔ x ∈ (−3, 3)</div></div>`,
+
+  '0-3': ()=>`
+    <div class="sec-tag">Modulo 1 · Lezione 4</div>
+    <div class="sec-title">Sup e inf</div>
+    <div class="sec-sub">Il concetto più importante di questo modulo — fondamentale per tutta l'Analisi 1.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">🏔️</div>
+    <div class="an-text">Il <strong>sup</strong> è il "tetto" di un insieme: il più piccolo valore ≥ di tutti gli elementi. Il <strong>max</strong> è il tetto che appartiene all'insieme. Il sup può esistere senza max.</div></div>
+    <div class="grid2">
+      <div class="g-item"><strong>A = [0, 1]</strong>sup = 1 ✅ (max)<br>inf = 0 ✅ (min)</div>
+      <div class="g-item"><strong>B = (0, 1)</strong>sup = 1 ❌ (no max)<br>inf = 0 ❌ (no min)</div>
+      <div class="g-item"><strong>C = {1/n, n≥1}</strong>1, ½, ⅓, …<br>sup = 1 ✅<br>inf = 0 ❌</div>
+      <div class="g-item highlight"><strong>Completezza ℝ</strong><span style="color:#cc8866;font-size:11px">Ogni sottoinsieme non vuoto e limitato sup. ha sup in ℝ.</span></div>
+    </div></div>`,
+
+  // MOD 1 — ALGEBRA
+  '1-0': ()=>`
+    <div class="sec-tag">Modulo 2 · Lezione 1</div>
+    <div class="sec-title">Polinomi</div>
+    <div class="sec-sub">Un polinomio è una somma di monomi — la base di tutta l'algebra.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">🧱</div>
+    <div class="an-text">Un <strong>monomio</strong> è un blocco: 3x², −5x, 7. Un <strong>polinomio</strong> è una costruzione fatta di blocchi: 3x² − 5x + 7. Il <strong>grado</strong> è la potenza più alta.</div></div>
+    <div class="formula">p(x) = aₙxⁿ + aₙ₋₁xⁿ⁻¹ + … + a₁x + a₀</div>
+    <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Somma</strong>: si sommano solo i termini dello stesso grado (monomi simili). 3x² + 2x² = 5x²</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Prodotto</strong>: si moltiplicano tutti i termini tra loro (proprietà distributiva)</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Prodotti notevoli</strong>: (a+b)² = a²+2ab+b², (a+b)(a−b) = a²−b²</div></div></div>`,
+
+  '1-1': ()=>`
+    <div class="sec-tag">Modulo 2 · Lezione 2</div>
+    <div class="sec-title">Equazioni di 1° grado</div>
+    <div class="sec-sub">ax + b = 0 — la forma più semplice. Il metodo si applica a qualsiasi equazione lineare.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">⚖️</div>
+    <div class="an-text">Un'equazione è una <strong>bilancia</strong>. Quello che fai su un lato devi farlo anche sull'altro per mantenere l'equilibrio.</div></div>
+    <div class="card-title" style="margin-top:10px">Esempio: 3x − 6 = 0</div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">Sposta il termine noto: <code>3x = 6</code></div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">Dividi per il coefficiente di x: <code>x = 6/3 = 2</code></div></div>
+    <div class="formula">ax + b = 0 → x = −b/a &nbsp; (se a ≠ 0)</div></div>`,
+
+  '1-2': ()=>`
+    <div class="sec-tag">Modulo 2 · Lezione 3</div>
+    <div class="sec-title">Equazioni di 2° grado</div>
+    <div class="sec-sub">ax² + bx + c = 0 — la formula quadratica è uno degli strumenti più potenti dell'algebra.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="formula">x = (−b ± √(b²−4ac)) / (2a)</div>
+    <div class="card-title" style="margin-top:12px">Il discriminante Δ = b²−4ac</div>
+    <div class="step"><div class="step-n">Δ>0</div><div class="step-t">Due soluzioni reali distinte</div></div>
+    <div class="step"><div class="step-n">Δ=0</div><div class="step-t">Una soluzione doppia: x = −b/(2a)</div></div>
+    <div class="step"><div class="step-n">Δ&lt;0</div><div class="step-t">Nessuna soluzione reale (soluzioni complesse)</div></div>
+    <div class="highlight-box">💡 <strong>Prima di usare la formula</strong>, prova a fattorizzare: x²−5x+6 = (x−2)(x−3) → x=2, x=3. Molto più veloce!</div></div>`,
+
+  '1-3': ()=>`
+    <div class="sec-tag">Modulo 2 · Lezione 4</div>
+    <div class="sec-title">Sistemi lineari</div>
+    <div class="sec-sub">Due equazioni, due incognite — tre metodi per risolverli.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">📍</div>
+    <div class="an-text">Un sistema di due equazioni lineari in 2 incognite rappresenta geometricamente <strong>due rette</strong>. La soluzione è il punto dove si incontrano.</div></div>
+    <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Sostituzione</strong>: ricava x dalla prima equazione, sostituisci nella seconda</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Riduzione</strong>: moltiplica e somma le equazioni per eliminare una variabile</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Cramer</strong>: usa i determinanti (utile per sistemi più grandi)</div></div></div>`,
+
+  '1-4': ()=>`
+    <div class="sec-tag">Modulo 2 · Lezione 5</div>
+    <div class="sec-title">Disequazioni</div>
+    <div class="sec-sub">Come le equazioni, ma la soluzione è un intervallo — non un punto.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="step"><div class="step-n">⚠️</div><div class="step-t">Se moltiplichi o dividi per un <strong>numero negativo</strong>, il verso della disequazione si inverte!</div></div>
+    <div class="formula">−2x > 4 → x &lt; −2</div>
+    <div class="card-title" style="margin-top:12px">Disequazione di 2° grado: ax²+bx+c > 0</div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">Trova le radici x₁, x₂ dell'equazione associata</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">Se a>0: la parabola è ∪ → positiva fuori dalle radici: <code>x &lt; x₁ o x > x₂</code></div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">Se a>0 e disequazione &lt; 0: positiva tra le radici: <code>x₁ &lt; x &lt; x₂</code></div></div></div>`,
+
+  '1-5': ()=>`
+    <div class="sec-tag">Modulo 2 · Lezione 6</div>
+    <div class="sec-title">Radicali</div>
+    <div class="sec-sub">√ e le sue proprietà — fondamentali per i limiti e le derivate.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="formula">√a · √b = √(ab) &nbsp;&nbsp; √a/√b = √(a/b)</div>
+    <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Razionalizzazione</strong>: moltiplica e dividi per il coniugato per eliminare radici al denominatore</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">Esempio: 1/√2 = √2/2 (moltiplico per √2/√2)</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">1/(√3−1) = (√3+1)/((√3)²−1²) = (√3+1)/2</div></div>
+    <div class="highlight-box">💡 La razionalizzazione è essenziale per calcolare limiti come lim (√(x+1)−1)/x per x→0</div></div>`,
+
+  // MOD 2 — FUNZIONI
+  '2-0': ()=>`
+    <div class="sec-tag">Modulo 3 · Lezione 1</div>
+    <div class="sec-title">Cos'è una funzione?</div>
+    <div class="sec-sub">Una funzione associa ogni elemento del dominio a esattamente un elemento del codominio.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">🏭</div>
+    <div class="an-text">Una funzione è una <strong>macchina</strong>: metti un numero x dentro, esce un numero f(x). Stessa x → sempre stessa uscita. Ma uscite diverse possono avere la stessa x? Dipende dalla funzione.</div></div>
+    <div class="formula">f : A → B &nbsp;&nbsp; x ↦ f(x)</div></div>`,
+
+  '2-1': ()=>`
+    <div class="sec-tag">Modulo 3 · Lezione 2</div>
+    <div class="sec-title">Dominio e codominio</div>
+    <div class="sec-sub">Il dominio è l'insieme dei valori "ammessi" in ingresso. Il codominio è tutto quello che può uscire.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Escluди</strong> i valori che rendono la funzione non definita: radici di negativi, divisioni per zero, log di non-positivi</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">f(x) = 1/x → x ≠ 0 → dominio: ℝ \ {0}</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">f(x) = √x → x ≥ 0 → dominio: [0, +∞)</div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-t">f(x) = log(x) → x > 0 → dominio: (0, +∞)</div></div></div>`,
+
+  '2-2': ()=>`
+    <div class="sec-tag">Modulo 3 · Lezione 3</div>
+    <div class="sec-title">Iniettiva e Suriettiva</div>
+    <div class="sec-sub">Due proprietà chiave che determinano se una funzione è invertibile.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="grid2">
+      <div class="g-item"><strong>Iniettiva</strong>x₁≠x₂ → f(x₁)≠f(x₂)<br>Valori diversi → immagini diverse. Test: retta orizzontale taglia il grafico al più 1 volta.</div>
+      <div class="g-item"><strong>Suriettiva</strong>Ogni y nel codominio ha almeno un x. Immagine = codominio.</div>
+      <div class="g-item highlight"><strong>Biiettiva</strong>Iniettiva E suriettiva → ha un'inversa f⁻¹</div>
+      <div class="g-item"><strong>Esempi</strong>f(x)=x²: non iniettiva (f(2)=f(−2)=4)<br>f(x)=eˣ: iniettiva ma non suriettiva su ℝ</div>
+    </div></div>`,
+
+  '2-3': ()=>`
+    <div class="sec-tag">Modulo 3 · Lezione 4</div>
+    <div class="sec-title">Funzione inversa</div>
+    <div class="sec-sub">L'inversa "annulla" la funzione originale — come fare e disfare un nodo.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">🔄</div>
+    <div class="an-text">Se f trasforma x in y, allora f⁻¹ trasforma y in x. <strong>f(f⁻¹(y)) = y</strong> e <strong>f⁻¹(f(x)) = x</strong>.</div></div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">Scrivi y = f(x)</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">Risolvi per x in funzione di y</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">Rinomina: x diventa f⁻¹(x), y diventa x</div></div>
+    <div class="highlight-box">Il grafico di f⁻¹ è la riflessione di f rispetto alla bisettrice y=x</div></div>`,
+
+  '2-4': ()=>`
+    <div class="sec-tag">Modulo 3 · Lezione 5</div>
+    <div class="sec-title">Funzioni composte</div>
+    <div class="sec-sub">g∘f: prima applica f, poi g al risultato. L'ordine conta!</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">🔗</div>
+    <div class="an-text">(g∘f)(x) = g(f(x)). Prima la macchina f, poi la macchina g. Come applicare prima il forno a microonde, poi il tostapane — l'ordine cambia tutto.</div></div>
+    <div class="formula">(g∘f)(x) = g(f(x))</div>
+    <div class="highlight-box">⚠️ g∘f ≠ f∘g in generale! Esempio: f(x)=x+1, g(x)=x²<br>(g∘f)(x) = (x+1)² &nbsp;&nbsp; (f∘g)(x) = x²+1</div></div>`,
+
+  // MOD 3 — FUNZIONI ELEMENTARI
+  '3-0': ()=>`
+    <div class="sec-tag">Modulo 4 · Lezione 1</div><div class="sec-title">Potenze e radici</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="formula">aⁿ · aᵐ = aⁿ⁺ᵐ &nbsp;&nbsp; (aⁿ)ᵐ = aⁿ·ᵐ &nbsp;&nbsp; a⁻ⁿ = 1/aⁿ</div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">a^(p/q) = q√(aᵖ) — esponente razionale = radice</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">a⁰ = 1 per ogni a ≠ 0</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">√a · √b = √(ab), √(a/b) = √a/√b</div></div></div>`,
+
+  '3-1': ()=>`
+    <div class="sec-tag">Modulo 4 · Lezione 2</div><div class="sec-title">Funzione esponenziale</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">📈</div>
+    <div class="an-text">eˣ cresce più velocemente di qualsiasi polinomio. È la funzione della crescita naturale — interessi composti, crescita batterica, decadimento radioattivo.</div></div>
+    <div class="formula">f(x) = aˣ &nbsp; (a > 0, a ≠ 1)</div>
+    <div class="grid2">
+      <div class="g-item"><strong>a > 1</strong>crescente, passa per (0,1)</div>
+      <div class="g-item"><strong>0 &lt; a &lt; 1</strong>decrescente, passa per (0,1)</div>
+      <div class="g-item"><strong>Dominio</strong>ℝ</div>
+      <div class="g-item"><strong>Codominio</strong>(0, +∞)</div>
+    </div></div>`,
+
+  '3-2': ()=>`
+    <div class="sec-tag">Modulo 4 · Lezione 3</div><div class="sec-title">Logaritmo</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">🔍</div>
+    <div class="an-text">log_a(x) risponde alla domanda: "a quale potenza devo elevare a per ottenere x?" È l'inversa dell'esponenziale.</div></div>
+    <div class="formula">log_a(x) = y ↔ aʸ = x</div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">log(xy) = log(x)+log(y)</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">log(x/y) = log(x)−log(y)</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">log(xⁿ) = n·log(x)</div></div>
+    <div class="highlight-box">ln(x) = log_e(x) — il logaritmo naturale, quello usato in Analisi 1</div></div>`,
+
+  '3-3': ()=>`
+    <div class="sec-tag">Modulo 4 · Lezione 4</div><div class="sec-title">Seno e coseno</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="formula">sin²x + cos²x = 1</div>
+    <div class="grid2">
+      <div class="g-item"><strong>sin(0)</strong>0</div><div class="g-item"><strong>cos(0)</strong>1</div>
+      <div class="g-item"><strong>sin(π/6)</strong>1/2</div><div class="g-item"><strong>cos(π/6)</strong>√3/2</div>
+      <div class="g-item"><strong>sin(π/4)</strong>√2/2</div><div class="g-item"><strong>cos(π/4)</strong>√2/2</div>
+      <div class="g-item"><strong>sin(π/3)</strong>√3/2</div><div class="g-item"><strong>cos(π/3)</strong>1/2</div>
+      <div class="g-item"><strong>sin(π/2)</strong>1</div><div class="g-item"><strong>cos(π/2)</strong>0</div>
+    </div>
+    <div class="highlight-box">Addizione: sin(a±b) = sin(a)cos(b) ± cos(a)sin(b)</div></div>`,
+
+  '3-4': ()=>`
+    <div class="sec-tag">Modulo 4 · Lezione 5</div><div class="sec-title">Tangente e funzioni inverse</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="formula">tan(x) = sin(x)/cos(x)</div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">arcsin: inversa di sin, dominio [−1,1], codominio [−π/2, π/2]</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">arccos: inversa di cos, dominio [−1,1], codominio [0, π]</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">arctan: inversa di tan, dominio ℝ, codominio (−π/2, π/2)</div></div></div>`,
+
+  '3-5': ()=>`
+    <div class="sec-tag">Modulo 4 · Lezione 6</div><div class="sec-title">Funzioni iperboliche</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="formula">sinh(x) = (eˣ−e⁻ˣ)/2 &nbsp;&nbsp; cosh(x) = (eˣ+e⁻ˣ)/2</div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">cosh²(x) − sinh²(x) = 1 (identità fondamentale)</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">tanh(x) = sinh(x)/cosh(x) ∈ (−1,1)</div></div>
+    <div class="highlight-box">Le iperboliche appaiono spesso negli integrali di Analisi 1 — conviene conoscerle.</div></div>`,
+
+  // MOD 4 — LIMITI
+  '4-0': ()=>`
+    <div class="sec-tag">Modulo 5 · Lezione 1</div><div class="sec-title">Definizione di limite</div>
+    <div class="sec-sub">Il limite descrive il comportamento di f(x) quando x si avvicina a un punto — senza necessariamente arrivarci.</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">🎯</div>
+    <div class="an-text">lim f(x) = L per x→c significa: posso far avvicinare f(x) a L quanto voglio, basta prendere x abbastanza vicino a c. Non importa cosa succede <strong>in c</strong>, solo <strong>vicino a c</strong>.</div></div>
+    <div class="formula">∀ε > 0 ∃δ > 0 : 0 &lt; |x−c| &lt; δ → |f(x)−L| &lt; ε</div>
+    <div class="highlight-box">ε (epsilon) misura quanto vogliamo che f(x) sia vicino a L. δ (delta) misura quanto vicino a c deve stare x.</div></div>`,
+
+  '4-1': ()=>`
+    <div class="sec-tag">Modulo 5 · Lezione 2</div><div class="sec-title">Algebra dei limiti</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">lim [f+g] = lim f + lim g</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">lim [f·g] = lim f · lim g</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">lim [f/g] = lim f / lim g &nbsp; (se lim g ≠ 0)</div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-t">lim [f(x)]ⁿ = [lim f(x)]ⁿ</div></div>
+    <div class="highlight-box">⚠️ Queste regole valgono solo se i limiti esistono e sono finiti. Quando non valgono, si usano altri metodi.</div></div>`,
+
+  '4-2': ()=>`
+    <div class="sec-tag">Modulo 5 · Lezione 3</div><div class="sec-title">Forme indeterminate</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="formula">0/0 &nbsp; ∞/∞ &nbsp; 0·∞ &nbsp; ∞−∞ &nbsp; 0⁰ &nbsp; 1^∞ &nbsp; ∞⁰</div>
+    <div class="card-body" style="margin-bottom:12px">Sono "forme indeterminate" — non si può calcolare direttamente. Serve manipolare l'espressione.</div>
+    <div class="step"><div class="step-n">0/0</div><div class="step-t">Fattorizza, razionalizza o usa de l'Hôpital</div></div>
+    <div class="step"><div class="step-n">∞/∞</div><div class="step-t">Dividi per il termine dominante o usa de l'Hôpital</div></div>
+    <div class="step"><div class="step-n">0·∞</div><div class="step-t">Riscrivi come 0/(1/∞) o ∞/(1/0) per ricondurlo a 0/0 o ∞/∞</div></div></div>`,
+
+  '4-3': ()=>`
+    <div class="sec-tag">Modulo 5 · Lezione 4</div><div class="sec-title">Limiti notevoli</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="formula">lim sin(x)/x = 1 &nbsp; (x→0)</div>
+    <div class="formula">lim (1+1/n)ⁿ = e &nbsp; (n→∞)</div>
+    <div class="formula">lim (eˣ−1)/x = 1 &nbsp; (x→0)</div>
+    <div class="formula">lim ln(1+x)/x = 1 &nbsp; (x→0)</div>
+    <div class="highlight-box">Questi limiti si usano come "mattoni" per calcolare limiti più complessi. Vanno memorizzati!</div></div>`,
+
+  '4-4': ()=>`
+    <div class="sec-tag">Modulo 5 · Lezione 5</div><div class="sec-title">Continuità</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">✏️</div>
+    <div class="an-text">Una funzione è <strong>continua in c</strong> se puoi disegnarla senza staccare la penna. Formalmente: il limite in c esiste, f(c) è definita, e coincidono.</div></div>
+    <div class="formula">f continua in c ↔ lim f(x) = f(c) per x→c</div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">Polinomi: continui ovunque</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">Razionali: continui dove il denominatore ≠ 0</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">sin, cos, eˣ, ln: continui nel loro dominio</div></div></div>`,
+
+  '4-5': ()=>`
+    <div class="sec-tag">Modulo 5 · Lezione 6</div><div class="sec-title">Teoremi fondamentali</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="step"><div class="step-n">IVT</div><div class="step-t"><strong>Teorema dei valori intermedi</strong>: se f è continua su [a,b] e f(a)≠f(b), allora assume tutti i valori intermedi. Utile per dimostrare esistenza di zeri.</div></div>
+    <div class="step"><div class="step-n">EVT</div><div class="step-t"><strong>Weierstrass</strong>: se f è continua su [a,b] chiuso e limitato, allora ha massimo e minimo assoluti.</div></div>
+    <div class="highlight-box">Il teorema dei valori intermedi è la base del metodo di bisezione per trovare zeri numericamente.</div></div>`,
+
+  // MOD 5 — DERIVATE
+  '5-0': ()=>`
+    <div class="sec-tag">Modulo 6 · Lezione 1</div><div class="sec-title">Definizione di derivata</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">🚗</div>
+    <div class="an-text">La derivata è la <strong>velocità istantanea</strong>. Se f(t) è la posizione, f'(t) è quanto veloce ci si muove in quell'istante — la pendenza della retta tangente al grafico.</div></div>
+    <div class="formula">f'(x) = lim [f(x+h)−f(x)]/h &nbsp; (h→0)</div></div>`,
+
+  '5-1': ()=>`
+    <div class="sec-tag">Modulo 6 · Lezione 2</div><div class="sec-title">Regole di derivazione</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">(c)' = 0 &nbsp;&nbsp; (xⁿ)' = nxⁿ⁻¹</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">(f+g)' = f'+g' &nbsp;&nbsp; (cf)' = cf'</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Prodotto:</strong> (fg)' = f'g+fg'</div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Quoziente:</strong> (f/g)' = (f'g−fg')/g²</div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-t">(sin x)' = cos x &nbsp;&nbsp; (cos x)' = −sin x</div></div>
+    <div class="step"><div class="step-n">6</div><div class="step-t">(eˣ)' = eˣ &nbsp;&nbsp; (ln x)' = 1/x</div></div></div>`,
+
+  '5-2': ()=>`
+    <div class="sec-tag">Modulo 6 · Lezione 3</div><div class="sec-title">Regola della catena</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">⛓️</div>
+    <div class="an-text">Derivata di una funzione composta: prima derivi la funzione esterna, poi moltiplichi per la derivata di quella interna.</div></div>
+    <div class="formula">[f(g(x))]' = f'(g(x)) · g'(x)</div>
+    <div class="step"><div class="step-n">Es</div><div class="step-t">[sin(x²)]' = cos(x²) · 2x</div></div>
+    <div class="step"><div class="step-n">Es</div><div class="step-t">[e^(3x)]' = e^(3x) · 3</div></div>
+    <div class="step"><div class="step-n">Es</div><div class="step-t">[ln(x²+1)]' = 1/(x²+1) · 2x = 2x/(x²+1)</div></div></div>`,
+
+  '5-3': ()=>`
+    <div class="sec-tag">Modulo 6 · Lezione 4</div><div class="sec-title">Teorema di Rolle e Lagrange</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="step"><div class="step-n">Rolle</div><div class="step-t">Se f è continua su [a,b], derivabile su (a,b) e f(a)=f(b) → ∃c∈(a,b) con f'(c)=0. (Esiste un punto con tangente orizzontale)</div></div>
+    <div class="step"><div class="step-n">Lagrange</div><div class="step-t">Se f è continua su [a,b] e derivabile su (a,b) → ∃c∈(a,b) con f'(c) = [f(b)−f(a)]/(b−a). (Esiste un punto dove la tangente è parallela alla secante)</div></div>
+    <div class="formula">f'(c) = [f(b)−f(a)] / (b−a)</div></div>`,
+
+  '5-4': ()=>`
+    <div class="sec-tag">Modulo 6 · Lezione 5</div><div class="sec-title">De l'Hôpital</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">🏥</div>
+    <div class="an-text">Quando un limite ha forma 0/0 o ∞/∞, puoi derivare numeratore e denominatore <strong>separatamente</strong> e riprovare il limite.</div></div>
+    <div class="formula">lim f(x)/g(x) = lim f'(x)/g'(x) &nbsp; (se forma 0/0 o ∞/∞)</div>
+    <div class="highlight-box">⚠️ Si derivi numeratore e denominatore <strong>separatamente</strong>, NON come un quoziente! (non si usa la regola del quoziente)</div></div>`,
+
+  '5-5': ()=>`
+    <div class="sec-tag">Modulo 6 · Lezione 6</div><div class="sec-title">Ottimizzazione</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">Calcola f'(x) e trova i punti critici: f'(x) = 0 o f'(x) non esiste</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Criterio della derivata prima</strong>: se f' cambia segno in c → c è max/min locale</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Criterio della derivata seconda</strong>: f''(c) > 0 → min locale, f''(c) &lt; 0 → max locale</div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-t">Confronta i valori ai punti critici e agli estremi del dominio per trovare max/min assoluti</div></div></div>`,
+
+  '5-6': ()=>`
+    <div class="sec-tag">Modulo 6 · Lezione 7</div><div class="sec-title">Studio di funzione</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Dominio</strong>: dove f è definita</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Simmetrie</strong>: pari (f(−x)=f(x)), dispari (f(−x)=−f(x))</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Limiti agli estremi</strong>: comportamento per x→±∞ e nei punti di discontinuità</div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Derivata prima</strong>: monotonia e punti critici</div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-t"><strong>Derivata seconda</strong>: concavità e flessi</div></div>
+    <div class="step"><div class="step-n">6</div><div class="step-t"><strong>Grafico</strong>: metti tutto insieme</div></div></div>`,
+
+  // MOD 6 — INTEGRALI
+  '6-0': ()=>`
+    <div class="sec-tag">Modulo 7 · Lezione 1</div><div class="sec-title">Integrale indefinito</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">⬅️</div>
+    <div class="an-text">L'integrale indefinito è l'operazione inversa della derivata: "qual è la funzione la cui derivata è f(x)?"</div></div>
+    <div class="formula">∫f(x)dx = F(x) + C &nbsp; dove F'(x) = f(x)</div>
+    <div class="step"><div class="step-n">1</div><div class="step-n" style="width:auto;border-radius:6px;background:var(--card2);color:var(--muted);font-size:12px;padding:4px 8px">∫xⁿdx = xⁿ⁺¹/(n+1)+C &nbsp;(n≠−1)</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">∫eˣdx = eˣ+C</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-t">∫sin(x)dx = −cos(x)+C</div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-t">∫cos(x)dx = sin(x)+C</div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-t">∫1/x dx = ln|x|+C</div></div></div>`,
+
+  '6-1': ()=>`
+    <div class="sec-tag">Modulo 7 · Lezione 2</div><div class="sec-title">Tecniche di integrazione</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="step"><div class="step-n">Sub</div><div class="step-t"><strong>Sostituzione</strong>: se vedo f(g(x))g'(x), pongo t=g(x). Esempio: ∫2x·sin(x²)dx → t=x², dt=2x dx → ∫sin(t)dt = −cos(t)+C = −cos(x²)+C</div></div>
+    <div class="step"><div class="step-n">PP</div><div class="step-t"><strong>Per parti</strong>: ∫u dv = uv − ∫v du. Regola LIATE: scegli u nell'ordine Log, Inversa, Algebrica, Trig, Esp.</div></div>
+    <div class="step"><div class="step-n">Fraz</div><div class="step-t"><strong>Frazioni parziali</strong>: decomponi il denominatore in fattori. Per integrare funzioni razionali.</div></div></div>`,
+
+  '6-2': ()=>`
+    <div class="sec-tag">Modulo 7 · Lezione 3</div><div class="sec-title">Integrale definito</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">📐</div>
+    <div class="an-text">∫[a,b] f(x)dx è l'area con segno tra il grafico di f e l'asse x, nell'intervallo [a,b]. Aree sopra l'asse contano positive, sotto negative.</div></div>
+    <div class="formula">∫[a,b] f(x)dx = F(b) − F(a)</div>
+    <div class="highlight-box">Proprietà: ∫[a,b]+∫[b,c] = ∫[a,c] &nbsp;&nbsp; ∫[a,a] = 0 &nbsp;&nbsp; ∫[a,b] = −∫[b,a]</div></div>`,
+
+  '6-3': ()=>`
+    <div class="sec-tag">Modulo 7 · Lezione 4</div><div class="sec-title">Teorema fondamentale</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="formula">d/dx [∫[a,x] f(t)dt] = f(x)</div>
+    <div class="analogy"><div class="an-icon">🔗</div>
+    <div class="an-text">Il teorema fondamentale del calcolo integrale collega le due operazioni fondamentali dell'analisi: derivazione e integrazione sono operazioni inverse. È il risultato più profondo del corso.</div></div>
+    <div class="step"><div class="step-n">1</div><div class="step-t">Se F'=f, allora ∫[a,b]f(x)dx = F(b)−F(a) (regola di Barrow)</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-t">La funzione G(x)=∫[a,x]f(t)dt è derivabile e G'(x)=f(x)</div></div></div>`,
+
+  '6-4': ()=>`
+    <div class="sec-tag">Modulo 7 · Lezione 5</div><div class="sec-title">Applicazioni</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="step"><div class="step-n">Area</div><div class="step-t">Area tra f e g su [a,b]: ∫[a,b]|f(x)−g(x)|dx</div></div>
+    <div class="step"><div class="step-n">Volume</div><div class="step-t">Solido di rotazione attorno all'asse x: V = π∫[a,b][f(x)]²dx</div></div>
+    <div class="step"><div class="step-n">Lunghezza</div><div class="step-t">Lunghezza arco: L = ∫[a,b]√(1+[f'(x)]²)dx</div></div>
+    <div class="step"><div class="step-n">Valor medio</div><div class="step-t">Valore medio di f su [a,b]: (1/(b−a))∫[a,b]f(x)dx</div></div></div>`,
+
+  // MOD 7 — SERIE
+  '7-0': ()=>`
+    <div class="sec-tag">Modulo 8 · Lezione 1</div><div class="sec-title">Successioni</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">🔢</div>
+    <div class="an-text">Una successione è un elenco infinito di numeri: a₁, a₂, a₃, … Una successione <strong>converge</strong> a L se i termini si avvicinano sempre di più a L.</div></div>
+    <div class="formula">lim aₙ = L per n→+∞</div>
+    <div class="step"><div class="step-n">Es</div><div class="step-t">aₙ = 1/n → 0 (converge a 0)</div></div>
+    <div class="step"><div class="step-n">Es</div><div class="step-t">aₙ = (−1)ⁿ → non converge (oscilla)</div></div>
+    <div class="step"><div class="step-n">Es</div><div class="step-t">aₙ = n² → +∞ (diverge)</div></div></div>`,
+
+  '7-1': ()=>`
+    <div class="sec-tag">Modulo 8 · Lezione 2</div><div class="sec-title">Serie numeriche</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="formula">∑(n=0,∞) aₙ = lim(N→∞) ∑(n=0,N) aₙ</div>
+    <div class="step"><div class="step-n">Geo</div><div class="step-t"><strong>Serie geometrica</strong>: ∑qⁿ = 1/(1−q) se |q|&lt;1, diverge se |q|≥1</div></div>
+    <div class="step"><div class="step-n">Arm</div><div class="step-t"><strong>Serie armonica</strong>: ∑1/n diverge (nonostante i termini → 0)</div></div>
+    <div class="highlight-box">⚠️ aₙ→0 è <strong>necessaria</strong> ma non sufficiente per la convergenza. La serie armonica lo dimostra.</div></div>`,
+
+  '7-2': ()=>`
+    <div class="sec-tag">Modulo 8 · Lezione 3</div><div class="sec-title">Criteri di convergenza</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="step"><div class="step-n">Conf</div><div class="step-t"><strong>Confronto</strong>: se 0≤aₙ≤bₙ e ∑bₙ converge → ∑aₙ converge</div></div>
+    <div class="step"><div class="step-n">Rap</div><div class="step-t"><strong>Rapporto (D'Alembert)</strong>: se lim |aₙ₊₁/aₙ| = L < 1 → converge; L > 1 → diverge</div></div>
+    <div class="step"><div class="step-n">Rad</div><div class="step-t"><strong>Radice (Cauchy)</strong>: se lim ⁿ√|aₙ| = L &lt; 1 → converge; L > 1 → diverge</div></div>
+    <div class="step"><div class="step-n">Int</div><div class="step-t"><strong>Integrale</strong>: ∑f(n) converge ↔ ∫f(x)dx converge (per f decrescente e positiva)</div></div></div>`,
+
+  '7-3': ()=>`
+    <div class="sec-tag">Modulo 8 · Lezione 4</div><div class="sec-title">Serie di Taylor</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="analogy"><div class="an-icon">🔭</div>
+    <div class="an-text">Taylor approssima qualsiasi funzione "liscia" con un polinomio di grado qualsiasi, attorno a un punto. Più termini usi, migliore è l'approssimazione.</div></div>
+    <div class="formula">f(x) = ∑(n=0,∞) f⁽ⁿ⁾(a)/n! · (x−a)ⁿ</div></div>`,
+
+  '7-4': ()=>`
+    <div class="sec-tag">Modulo 8 · Lezione 5</div><div class="sec-title">Serie di McLaurin</div>
+    <div class="card"><div class="card-top"></div>
+    <div class="card-body" style="margin-bottom:12px">Taylor centrato in a=0. Queste vanno memorizzate:</div>
+    <div class="formula">eˣ = 1 + x + x²/2! + x³/3! + …</div>
+    <div class="formula">sin(x) = x − x³/3! + x⁵/5! − …</div>
+    <div class="formula">cos(x) = 1 − x²/2! + x⁴/4! − …</div>
+    <div class="formula">ln(1+x) = x − x²/2 + x³/3 − … &nbsp;(|x|&lt;1)</div>
+    <div class="formula">1/(1−x) = 1 + x + x² + … &nbsp;(|x|&lt;1)</div>`,
+};
+
+// ═══════════════════════════════════════
+// QUIZ DATA (per ogni modulo)
+// ═══════════════════════════════════════
+const QUIZZES = {
+  0: [
+    {q:"Quale NON appartiene a ℚ?",opts:["22/7","√9","√5","0.125"],c:2,ex:"22/7 e 0.125=1/8 sono frazioni. √9=3 è intero. √5 ha decimali infiniti non periodici → irrazionale → ∉ ℚ."},
+    {q:"ℤ ⊂ ℚ significa che...",opts:["ℤ=ℚ","ogni intero è razionale","ogni razionale è intero","ℚ⊂ℤ"],c:1,ex:"A⊂B: ogni elemento di A è in B. Ogni intero n=n/1 → razionale. Non vale il contrario: 1/2∈ℚ ma ∉ℤ."},
+    {q:"|−5| − |3−8| = ?",opts:["0","10","−10","2"],c:0,ex:"|−5|=5, |3−8|=|−5|=5. Risultato: 5−5=0."},
+    {q:"(0,1) ha minimo?",opts:["Sì, min=0","Sì, min=1","No, ma inf=0","No, inf non esiste"],c:2,ex:"0 è l'inf ma 0∉(0,1) (aperto). Quindi non esiste il minimo."},
+    {q:"La completezza di ℝ afferma che...",opts:["ℝ ha ∞ elementi","ogni insieme limitato sup. ha sup in ℝ","in ℝ si può sempre dividere","ℝ=ℚ"],c:1,ex:"Assioma del sup: ogni A⊆ℝ non vuoto e limitato sup. ha sup∈ℝ. ℚ non ha questa proprietà (√2∉ℚ)."}
+  ],
+  1: [
+    {q:"(a+b)² = ?",opts:["a²+b²","a²+2ab+b²","a²−2ab+b²","a²+ab+b²"],c:1,ex:"Prodotto notevole: (a+b)²=(a+b)(a+b)=a²+ab+ab+b²=a²+2ab+b²."},
+    {q:"Il discriminante di x²−5x+6 è?",opts:["1","25","−24","49"],c:0,ex:"Δ=b²−4ac=(−5)²−4·1·6=25−24=1. Positivo → due radici reali distinte."},
+    {q:"x²−5x+6=0 ha soluzioni?",opts:["x=2, x=3","x=−2, x=−3","x=1, x=6","nessuna"],c:0,ex:"Δ=1>0, x=(5±1)/2. x₁=3, x₂=2. Verifica: (x−2)(x−3)=0."},
+    {q:"−3x > 9 → x ?",opts:["x>−3","x<−3","x>3","x<3"],c:1,ex:"Divido per −3: il verso si inverte! −3x>9 → x<−3."},
+    {q:"Razionalizzare 1/√3 = ?",opts:["√3","√3/3","3/√3","1/3"],c:1,ex:"Moltiplico per √3/√3: 1/√3 · √3/√3 = √3/3."}
+  ],
+  2: [
+    {q:"Dominio di f(x)=√(x−2)?",opts:["ℝ","x>2","x≥2","x≤2"],c:2,ex:"L'argomento della radice deve essere ≥0: x−2≥0 → x≥2. Dominio: [2,+∞)."},
+    {q:"f(x)=x² è iniettiva su ℝ?",opts:["Sì","No","Solo per x≥0","Solo per x≤0"],c:1,ex:"f(2)=f(−2)=4 → stessa immagine per x diversi → NON iniettiva su ℝ."},
+    {q:"(g∘f)(x) = ?",opts:["f(g(x))","g(f(x))","g(x)·f(x)","g(x)+f(x)"],c:1,ex:"g∘f significa 'prima f poi g': (g∘f)(x)=g(f(x))."},
+    {q:"f(x)=2x+1, trovare f⁻¹(x)?",opts:["(x−1)/2","(x+1)/2","2x−1","x/2+1"],c:0,ex:"y=2x+1 → 2x=y−1 → x=(y−1)/2. Quindi f⁻¹(x)=(x−1)/2."},
+    {q:"Dominio di f(x)=ln(x²−4)?",opts:["x≠±2","x>2","x<−2 o x>2","x²>4"],c:2,ex:"x²−4>0 → x²>4 → |x|>2 → x<−2 oppure x>2."}
+  ],
+  3: [
+    {q:"eˣ è sempre...",opts:["positivo","negativo","intero","razionale"],c:0,ex:"eˣ > 0 per ogni x∈ℝ. Il codominio di eˣ è (0,+∞)."},
+    {q:"ln(e³) = ?",opts:["e³","3","3e","1/3"],c:1,ex:"ln è l'inversa di e: ln(eˣ)=x. Quindi ln(e³)=3."},
+    {q:"sin(π/6) = ?",opts:["1/2","√2/2","√3/2","1"],c:0,ex:"Angolo 30°: sin(30°)=1/2. Da memorizzare!"},
+    {q:"log(a·b) = ?",opts:["log(a)+log(b)","log(a)·log(b)","log(a)−log(b)","log(a/b)"],c:0,ex:"Proprietà fondamentale del logaritmo: log(a·b)=log(a)+log(b)."},
+    {q:"cosh²(x)−sinh²(x) = ?",opts:["0","1","2","eˣ"],c:1,ex:"Identità fondamentale delle funzioni iperboliche: cosh²(x)−sinh²(x)=1."}
+  ],
+  4: [
+    {q:"lim sin(x)/x per x→0 = ?",opts:["0","1","∞","non esiste"],c:1,ex:"Limite notevole fondamentale. lim sin(x)/x = 1 per x→0. Da memorizzare!"},
+    {q:"f continua in c significa?",opts:["f(c)=0","lim f(x)=f(c)","f'(c) esiste","f(c)=1"],c:1,ex:"Continuità in c: il limite esiste, f(c) è definita e coincidono: lim f(x)=f(c)."},
+    {q:"lim (1+1/n)ⁿ per n→∞ = ?",opts:["1","∞","e","π"],c:2,ex:"Definizione del numero e≈2.718. Limite notevole fondamentale."},
+    {q:"0/0 è una forma...",opts:["determinata (=0)","determinata (=1)","indeterminata","infinita"],c:2,ex:"0/0 è forma indeterminata: il risultato dipende da come ci si arriva. Serve analizzare caso per caso."},
+    {q:"Il teorema di Weierstrass garantisce...",opts:["derivabilità","continuità","max e min su [a,b]","il valore intermedio"],c:2,ex:"Su [a,b] chiuso e limitato, se f è continua allora ha massimo e minimo assoluti."}
+  ],
+  5: [
+    {q:"(xⁿ)' = ?",opts:["nxⁿ","nxⁿ⁻¹","xⁿ⁻¹","nxⁿ⁺¹"],c:1,ex:"Regola della potenza: d/dx(xⁿ) = nxⁿ⁻¹. Esempio: (x³)'=3x²."},
+    {q:"(sin x)' = ?",opts:["−sin x","cos x","−cos x","tan x"],c:1,ex:"(sin x)' = cos x. Analogamente (cos x)' = −sin x."},
+    {q:"[f(g(x))]' = ?",opts:["f'(x)·g'(x)","f'(g(x))·g'(x)","f(g'(x))","f'(g(x))"],c:1,ex:"Regola della catena: prima derivi la funzione esterna valutata in g(x), poi moltiplichi per g'(x)."},
+    {q:"[sin(x²)]' = ?",opts:["cos(x²)","2x·cos(x)","2x·cos(x²)","cos(2x)"],c:2,ex:"Catena: f=sin, g=x². f'(g(x))=cos(x²), g'(x)=2x. Risultato: 2x·cos(x²)."},
+    {q:"f''(c)>0 implica?",opts:["max locale in c","min locale in c","flesso in c","niente"],c:1,ex:"Criterio della derivata seconda: f'(c)=0 e f''(c)>0 → minimo locale. f''(c)<0 → massimo locale."}
+  ],
+  6: [
+    {q:"∫xⁿdx = ? (n≠−1)",opts:["xⁿ⁺¹+C","xⁿ⁺¹/(n+1)+C","nxⁿ⁻¹+C","xⁿ/n+C"],c:1,ex:"Regola della potenza per gli integrali: ∫xⁿdx = xⁿ⁺¹/(n+1)+C."},
+    {q:"∫eˣdx = ?",opts:["eˣ/x+C","eˣ+C","eˣ⁺¹+C","xeˣ+C"],c:1,ex:"La funzione eˣ è l'unica che è uguale alla propria primitiva: ∫eˣdx = eˣ+C."},
+    {q:"Il teorema fondamentale del calcolo afferma?",opts:["∫f=f'","d/dx[∫f]=f","∫f'=f","∫f=lim f"],c:1,ex:"d/dx[∫[a,x]f(t)dt] = f(x). Derivazione e integrazione sono operazioni inverse."},
+    {q:"∫[0,1] x dx = ?",opts:["1","1/2","2","0"],c:1,ex:"F(x)=x²/2. F(1)−F(0) = 1/2 − 0 = 1/2."},
+    {q:"Tecnica per ∫2x·sin(x²)dx?",opts:["per parti","sostituzione t=x²","frazioni parziali","diretta"],c:1,ex:"Sostituzione: t=x², dt=2x dx → ∫sin(t)dt = −cos(t)+C = −cos(x²)+C."}
+  ],
+  7: [
+    {q:"La serie armonica ∑1/n...",opts:["converge a 1","converge a ln(2)","diverge","converge a e"],c:2,ex:"∑1/n diverge! Nonostante 1/n→0, la somma non ha limite finito. È il controesempio classico."},
+    {q:"∑qⁿ converge se...",opts:["|q|<1","|q|>1","q>0","q<1"],c:0,ex:"Serie geometrica: ∑qⁿ = 1/(1−q) se |q|<1. Diverge se |q|≥1."},
+    {q:"eˣ in McLaurin = ?",opts:["1+x+x²/2+…","x+x²/2+…","1+x+x²+…","x−x³/3!+…"],c:0,ex:"eˣ = ∑xⁿ/n! = 1 + x + x²/2! + x³/3! + … Converge per ogni x∈ℝ."},
+    {q:"Criterio del rapporto: lim|aₙ₊₁/aₙ|=L<1 implica?",opts:["divergenza","convergenza","oscillazione","niente"],c:1,ex:"D'Alembert: L<1 → convergenza assoluta. L>1 → divergenza. L=1 → non conclusivo."},
+    {q:"sin(x) in McLaurin = ?",opts:["1−x²/2!+…","x+x³/3!+…","x−x³/3!+x⁵/5!−…","cos(x)"],c:2,ex:"sin(x) = x − x³/3! + x⁵/5! − … (solo potenze dispari, segni alternati)."}
+  ]
+};
+
+// ═══════════════════════════════════════
+// THEORY RENDER
+// ═══════════════════════════════════════
+function renderTheory(){
+  const m = S.modules[currentModule];
+  const tc = document.getElementById('theory-content');
+  tc.innerHTML = `
+    <div class="sec-tag">Modulo ${currentModule+1} — ${m.name}</div>
+    <div class="sec-title" style="font-size:24px">Scegli la lezione</div>
+    <div class="lesson-list" id="lesson-list"></div>
+  `;
+  const ll = document.getElementById('lesson-list');
+  m.lessons.forEach((l,i)=>{
+    const done = m.done.includes(i);
+    const div = document.createElement('div');
+    div.className = 'lesson-item'+(done?' done':'')+(i===currentLesson?' active':'');
+    div.innerHTML = `<div class="li-icon">${done?'✅':'📖'}</div>
+      <div class="li-info"><div class="li-title">${l}</div><div class="li-sub">Lezione ${i+1}</div></div>
+      <div class="li-status">${done?'':'›'}</div>`;
+    div.onclick = ()=>{ currentLesson=i; showLesson(); };
+    ll.appendChild(div);
+  });
+  // lesson nav
+  const nav = document.createElement('div');
+  nav.className='lesson-nav';
+  nav.innerHTML = `<button class="ln-btn ln-ghost" onclick="goP('home')">← Percorso</button>
+    <button class="ln-btn ln-primary" onclick="goP('quiz')">Vai al Quiz →</button>`;
+  tc.appendChild(nav);
+}
+
+function showLesson(){
+  const key = `${currentModule}-${currentLesson}`;
+  const fn = THEORY[key];
+  const tc = document.getElementById('theory-content');
+  if(!fn){ tc.innerHTML=`<div class="sec-sub" style="padding:20px">Lezione in preparazione.</div>`; return; }
+  tc.innerHTML = fn();
+  // inject interactivity
+  if(document.getElementById('abs-sl')) updAbs();
+  // mark done
+  const m = S.modules[currentModule];
+  if(!m.done.includes(currentLesson)){
+    m.done.push(currentLesson);
+    m.pct = Math.round((m.done.length/m.lessons.length)*100);
+    addXP(10);
+    save();
+  }
+  // nav buttons
+  const nav = document.createElement('div');
+  nav.className='lesson-nav';
+  const hasNext = currentLesson < S.modules[currentModule].lessons.length-1;
+  nav.innerHTML = `
+    <button class="ln-btn ln-ghost" onclick="renderTheory()">← Lezioni</button>
+    ${hasNext?`<button class="ln-btn ln-primary" onclick="currentLesson++;showLesson()">Prossima →</button>`
+             :`<button class="ln-btn ln-primary" onclick="goP('quiz')">Vai al Quiz 🧠</button>`}`;
+  tc.appendChild(nav);
+  document.getElementById('main-scroll').scrollTop=0;
+}
+
+// venn tap
+const setInfos={
+  N:'<strong style="color:#a78bfa">ℕ — Naturali</strong>: 0,1,2,3,… — numeri del conteggio. ✅ Somma e prodotto ok. ❌ 3−5 non esiste in ℕ.',
+  Z:'<strong style="color:#4a90e2">ℤ — Interi</strong>: …,−2,−1,0,1,2,… — aggiungono i negativi. ✅ Sottrazione ok. ❌ 1÷3 non è intero.',
+  Q:'<strong style="color:#3ecf8e">ℚ — Razionali</strong>: frazioni p/q con q≠0. In decimale: sempre periodici. ❌ √2 non è razionale.',
+  R:'<strong style="color:#e07c39">ℝ — Reali</strong>: razionali + irrazionali (√2, π, e…). 🔑 Completezza: ogni insieme limitato sup. ha sup in ℝ.'
+};
+function tapS(id){ const el=document.getElementById('set-info'); if(el) el.innerHTML=setInfos[id]||''; }
+function nlI(msg,col){ const el=document.getElementById('nl-info'); if(el){el.textContent=msg;el.style.color=col;} }
+function updAbs(){ const v=parseFloat(document.getElementById('abs-sl').value); document.getElementById('ax').textContent=v%1===0?v:v.toFixed(1); document.getElementById('av').textContent=Math.abs(v)%1===0?Math.abs(v):Math.abs(v).toFixed(1); }
+
+// ═══════════════════════════════════════
+// EXERCISES
+// ═══════════════════════════════════════
+let exDiff='easy'; let exN=0;
+const topicPrompts={
+  insiemi:'insiemi numerici ℕ,ℤ,ℚ,ℝ, valore assoluto e sue disuguaglianze, sup e inf',
+  algebra:'polinomi, equazioni di 1° e 2° grado, sistemi lineari, disequazioni, radicali',
+  funzioni:'dominio, codominio, iniettività, suriettività, funzione inversa, funzioni composte',
+  'funzioni-elem':'esponenziale, logaritmo, funzioni trigonometriche (sin,cos,tan), funzioni iperboliche',
+  limiti:'limiti di funzioni, forme indeterminate, limiti notevoli (sin(x)/x, (1+1/n)^n, ecc.), continuità',
+  derivate:'regole di derivazione, regola della catena, teoremi (Rolle, Lagrange, de l\'Hôpital), ottimizzazione',
+  integrali:'integrali immediati, integrazione per sostituzione, per parti, frazioni parziali, integrale definito e teorema fondamentale',
+  serie:'successioni, serie numeriche, criteri di convergenza (rapporto, radice, confronto), Taylor e McLaurin'
+};
+const diffPrompts={
+  easy:'elementari e concettuali — classificazione, applicazione diretta di definizioni',
+  medium:'calcolo e ragionamento — richiedono applicazione di tecniche standard',
+  hard:'avanzati — combinano più concetti, richiedono pensiero critico',
+  challenge:'livello esame universitario — dimostrazioni, ragionamenti profondi, casi non banali'
+};
+const diffMeta={easy:{l:'Facile',c:'easy'},medium:{l:'Intermedio',c:'medium'},hard:{l:'Avanzato',c:'hard'},challenge:{l:'Sfida',c:'challenge'}};
+const diffEmoji={easy:'🟢',medium:'🟡',hard:'🔴',challenge:'🟣'};
+
+function setDiff(d){
+  exDiff=d;
+  ['easy','med','hard','chal'].forEach(x=>document.getElementById('ch-'+x).className='diff-chip');
+  const map={easy:'ch-easy',medium:'ch-med',hard:'ch-hard',challenge:'ch-chal'};
+  const cls={easy:'s-easy',medium:'s-med',hard:'s-hard',challenge:'s-chal'};
+  document.getElementById(map[d]).className='diff-chip '+cls[d];
+}
+
+async function genExercises(){
+  const btn=document.getElementById('gen-btn');
+  const load=document.getElementById('ex-load');
+  const ph=document.getElementById('ex-ph');
+  const topic=document.getElementById('topic-sel').value;
+  btn.disabled=true; btn.textContent='Generazione…';
+  load.style.display='block'; if(ph) ph.style.display='none';
+  const prompt=`Crea 4 esercizi di livello ${diffPrompts[exDiff]} sull'argomento: ${topicPrompts[topic]}.
+Destinatario: studente universitario che studia per l'esame di Analisi 1.
+Rispondi SOLO con un JSON array di 4 oggetti, senza markdown, senza backtick, senza commenti.
+Ogni oggetto: {"question":"domanda matematica precisa","hint":"suggerimento 1 frase","answer":"risposta esatta concisa","explanation":"spiegazione 2-3 frasi in italiano semplice"}`;
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1500,
+        messages:[{role:"user",content:prompt}]})});
+    const d=await r.json();
+    const exs=JSON.parse(d.content[0].text.trim().replace(/```json|```/g,'').trim());
+    load.style.display='none';
+    const list=document.getElementById('ex-list');
+    exs.forEach(ex=>{
+      exN++;
+      const m=diffMeta[exDiff];
+      const div=document.createElement('div');
+      div.className=`ex-card ${m.c}`;
+      div.id=`ec${exN}`;
+      const eid=exN;
+      div.innerHTML=`<div class="ex-badge ${m.c}">${diffEmoji[exDiff]} ${m.l} · #${eid}</div>
+        <div class="ex-q">${esc(ex.question)}</div>
+        <span class="hint-toggle" onclick="tgH(${eid})">💡 Suggerimento</span>
+        <div class="hint-box" id="hb${eid}">${esc(ex.hint)}</div>
+        <input class="ex-input" id="ei${eid}" placeholder="La tua risposta…" inputmode="text"
+          onkeydown="if(event.key==='Enter')chEx(${eid},'${ej(ex.answer)}','${ej(ex.explanation)}')">
+        <button class="ex-verify" onclick="chEx(${eid},'${ej(ex.answer)}','${ej(ex.explanation)}')">Verifica ✓</button>
+        <div class="ex-fb" id="fb${eid}"></div>`;
+      list.appendChild(div);
+    });
+  }catch(e){
+    load.style.display='none';
+    const err=document.createElement('div');
+    err.style='padding:14px;background:#2a0f0f;border-radius:12px;color:#f8a0a0;font-size:14px;margin-bottom:12px';
+    err.textContent='⚠️ Errore di generazione. Riprova.';
+    document.getElementById('ex-list').appendChild(err);
+  }
+  btn.disabled=false;btn.innerHTML='✦ Genera altri 4';
+}
+function tgH(id){document.getElementById('hb'+id).classList.toggle('show');}
+function chEx(id,ans,expl){
+  const inp=document.getElementById('ei'+id);
+  const u=inp.value.trim().toLowerCase();
+  const c=ans.toLowerCase();
+  const ok=u===c||c.includes(u)||u.includes(c)||u.replace(/\s/g,'')===c.replace(/\s/g,'');
+  const fb=document.getElementById('fb'+id);
+  S.exDone++;
+  if(ok){S.exCorrect++;addXP(5);fb.className='ex-fb ok';fb.innerHTML=`✅ <strong>Corretto!</strong> ${esc(expl)}`;inp.style.borderColor='var(--green)';}
+  else{fb.className='ex-fb ko';fb.innerHTML=`❌ <strong>Risposta: ${esc(ans)}</strong><br>${esc(expl)}`;inp.style.borderColor='var(--red)';}
+  save();
+}
+
+// ═══════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════
+let qMod=0,qCur=0;
+const qAns={};
+
+function renderQuizMenu(){
+  const qc=document.getElementById('qcontainer');
+  const sb=document.getElementById('score-box');
+  sb.classList.remove('show');
+  qMod=currentModule;
+  document.getElementById('quiz-title').textContent=`Quiz — Modulo ${qMod+1}`;
+  qCur=0;Object.keys(qAns).forEach(k=>delete qAns[k]);
+  document.getElementById('qprog').style.width='0%';
+  renderQ();
+}
+
+function renderQ(){
+  const qc=document.getElementById('qcontainer');
+  qc.innerHTML='';
+  const qs=QUIZZES[qMod];
+  if(!qs){qc.innerHTML='<div class="sec-sub">Quiz non ancora disponibile per questo modulo.</div>';return;}
+  const q=qs[qCur];
+  const div=document.createElement('div');
+  div.className='qcard';
+  div.innerHTML=`<div class="q-meta">Domanda ${qCur+1} di ${qs.length}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="q-opts" id="qopts">
+      ${q.opts.map((o,i)=>`<div class="q-opt" id="qo${i}" onclick="selQ(${i})">
+        <span class="q-letter">${'ABCD'[i]}</span>${esc(o)}</div>`).join('')}
+    </div>
+    <div class="q-explain" id="qex">${q.ex}</div>
+    <div class="q-nav">
+      ${qCur>0?`<button class="q-btn ghost" onclick="prevQ()">← Indietro</button>`:`<div></div>`}
+      <button class="q-btn primary" id="qnext" onclick="nextQ()" ${qAns[qCur]===undefined?'disabled':''}>
+        ${qCur===qs.length-1?'Termina ✓':'Conferma →'}</button>
+    </div>`;
+  qc.appendChild(div);
+  if(qAns[qCur]!==undefined)selQ(qAns[qCur],true);
+}
+function selQ(i,r=false){
+  if(document.getElementById('qex').classList.contains('show')&&!r)return;
+  document.querySelectorAll('.q-opt').forEach(o=>o.classList.remove('sel'));
+  document.getElementById('qo'+i).classList.add('sel');
+  qAns[qCur]=i;
+  document.getElementById('qnext').disabled=false;
+}
+function nextQ(){
+  if(qAns[qCur]===undefined)return;
+  revealQ();
+  const qs=QUIZZES[qMod];
+  const btn=document.getElementById('qnext');
+  btn.disabled=true;
+  setTimeout(()=>{
+    if(qCur<qs.length-1){qCur++;document.getElementById('qprog').style.width=(qCur/qs.length*100)+'%';renderQ();}
+    else showScore();
+  },1700);
+}
+function prevQ(){if(qCur>0){qCur--;renderQ();}}
+function revealQ(){
+  const q=QUIZZES[qMod][qCur];
+  document.querySelectorAll('.q-opt').forEach((o,i)=>{
+    if(i===q.c)o.classList.add('ok');
+    else if(i===qAns[qCur]&&i!==q.c)o.classList.add('ko');
+    o.onclick=null;
+  });
+  document.getElementById('qex').classList.add('show');
+}
+function showScore(){
+  document.getElementById('qcontainer').innerHTML='';
+  document.getElementById('qprog').style.width='100%';
+  const qs=QUIZZES[qMod];
+  let sc=0;qs.forEach((q,i)=>{if(qAns[i]===q.c)sc++;});
+  const sb=document.getElementById('score-box');
+  sb.classList.add('show');
+  document.getElementById('sc-n').textContent=sc+'/'+qs.length;
+  document.getElementById('sc-s').textContent=['','⭐','⭐⭐','⭐⭐⭐','⭐⭐⭐⭐','⭐⭐⭐⭐⭐'][sc]||'';
+  const msgs={5:'Perfetto! 🎉 Modulo successivo sbloccato.',4:'Ottimo! Modulo sbloccato.',3:'Passato! Puoi procedere.',2:'Non ancora — riprova.',1:'Torna alla teoria prima.'};
+  document.getElementById('sc-m').textContent=msgs[sc]||'';
+  const passed = sc >= 3;
+  if(passed){
+    S.modules[qMod].quizDone=true;
+    S.modules[qMod].quizScore=sc;
+    addXP(sc*20);
+    save();
+  }
+}
+function retryQuiz(){renderQuizMenu();}
+
+// ═══════════════════════════════════════
+// TUTOR
+// ═══════════════════════════════════════
+async function sendMsg(){
+  const inp=document.getElementById('chat-in');
+  const btn=document.getElementById('cs-btn');
+  const hist=document.getElementById('chat-hist');
+  const msg=inp.value.trim();
+  if(!msg)return;
+  hist.innerHTML+=`<div class="cmsg user"><div class="cav user">👤</div><div class="cbub user">${esc(msg)}</div></div>`;
+  inp.value='';btn.disabled=true;hist.scrollTop=9999;
+  const tid='t'+Date.now();
+  hist.innerHTML+=`<div class="cmsg ai" id="${tid}"><div class="cav ai">🧮</div><div class="cbub ai" style="color:var(--muted)">…</div></div>`;
+  hist.scrollTop=9999;
+  const topicCtx=S.modules[currentModule].name;
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:500,
+        messages:[{role:"user",content:`Sei un tutor di matematica universitaria. Lo studente sta studiando "${topicCtx}" per l'esame di Analisi 1. Studia da zero dopo il liceo scientifico. Rispondi in italiano, semplice e diretto, massimo 120 parole, con esempi concreti. Domanda: "${msg}"`}]})});
+    const d=await r.json();
+    document.getElementById(tid).remove();
+    hist.innerHTML+=`<div class="cmsg ai"><div class="cav ai">🧮</div><div class="cbub ai">${esc(d.content[0].text)}</div></div>`;
+  }catch(e){
+    document.getElementById(tid).remove();
+    hist.innerHTML+=`<div class="cmsg ai"><div class="cav ai">🧮</div><div class="cbub ai" style="color:var(--red)">Errore. Riprova.</div></div>`;
+  }
+  btn.disabled=false;hist.scrollTop=9999;
+}
+
+// ═══════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════
+function renderStats(){
+  document.getElementById('st-xp').textContent=S.xp;
+  document.getElementById('st-streak').textContent=S.streak;
+  document.getElementById('st-ex').textContent=S.exDone;
+  const pct=S.exDone>0?Math.round(S.exCorrect/S.exDone*100):0;
+  document.getElementById('st-cor').textContent=pct+'%';
+  const mp=document.getElementById('mod-progress');
+  mp.innerHTML='';
+  S.modules.forEach((m,i)=>{
+    const p=m.pct;
+    const cls=m.quizDone?'g':'';
+    mp.innerHTML+=`<div class="prog-row">
+      <div class="prog-label">${m.emoji} ${m.name}</div>
+      <div class="prog-pct">${p}%</div>
+      <div class="prog-bar"><div class="prog-fill ${cls}" style="width:${p}%"></div></div>
+    </div>`;
+  });
+}
+
+// ═══════════════════════════════════════
+// INSTALL (PWA)
+// ═══════════════════════════════════════
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  document.getElementById('install-banner').style.display='flex';
+});
+function doInstall(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(()=>{
+      deferredPrompt=null;
+      document.getElementById('install-banner').style.display='none';
+    });
+  }
+}
+// iOS
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.navigator.standalone;
+if(isIOS)document.getElementById('ios-banner').style.display='flex';
+
+// ═══════════════════════════════════════
+// STREAK
+// ═══════════════════════════════════════
+function checkStreak(){
+  const today=new Date().toDateString();
+  if(S.lastDate!==today){
+    const yesterday=new Date(Date.now()-86400000).toDateString();
+    S.streak=S.lastDate===yesterday?S.streak+1:1;
+    S.lastDate=today;save();
+  }
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+checkStreak();
+updateTopBar();
+renderRoadmap();
+
+// UTILS
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function ej(s){return(s||'').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,' ');}
+// ═══════════════════════════════════════
+// CAMERA / CORREZIONE
+// ═══════════════════════════════════════
+let selectedImageB64 = null;
+let selectedImageType = null;
+
+function triggerCamera(){
+  document.getElementById('cam-input').click();
+}
+
+function onImageSelected(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  selectedImageType = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = e => {
+    // extract base64 without data URL prefix
+    const dataUrl = e.target.result;
+    selectedImageB64 = dataUrl.split(',')[1];
+    // show preview
+    document.getElementById('cam-preview').src = dataUrl;
+    document.getElementById('cam-preview-wrap').style.display = 'block';
+    document.getElementById('cam-context-wrap').style.display = 'block';
+    document.getElementById('cam-upload-area').style.display = 'none';
+    document.getElementById('cam-result').innerHTML = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function resetCamera(){
+  selectedImageB64 = null;
+  document.getElementById('cam-preview-wrap').style.display = 'none';
+  document.getElementById('cam-context-wrap').style.display = 'none';
+  document.getElementById('cam-upload-area').style.display = 'block';
+  document.getElementById('cam-result').innerHTML = '';
+  document.getElementById('cam-context').value = '';
+  document.getElementById('cam-input').value = '';
+}
+
+async function analyzeImage(){
+  if(!selectedImageB64) return;
+  const btn = document.getElementById('cam-analyze-btn');
+  const load = document.getElementById('cam-load');
+  const result = document.getElementById('cam-result');
+  const context = document.getElementById('cam-context').value.trim();
+  btn.disabled = true;
+  load.style.display = 'block';
+  result.innerHTML = '';
+
+  const contextNote = context ? `Contesto fornito dallo studente: "${context}". ` : '';
+  const prompt = `${contextNote}Analizza questo svolgimento matematico scritto a mano da uno studente universitario che studia per l'esame di Analisi 1.
+
+Il tuo compito:
+1. Identifica l'esercizio o il tipo di problema
+2. Analizza ogni passaggio dello svolgimento
+3. Segnala errori (anche piccoli), imprecisioni o passaggi mancanti
+4. Se lo svolgimento è corretto, confermalo con entusiasmo
+5. Alla fine dai un voto da 0 a 10
+
+Rispondi SOLO con un JSON con questa struttura, senza markdown, senza backtick:
+{
+  "exercise": "descrizione breve dell'esercizio riconosciuto",
+  "verdict": "corretto" | "errori" | "parziale",
+  "score": numero da 0 a 10,
+  "steps": [
+    {"status": "ok" | "ko" | "note", "text": "descrizione del passaggio e commento"}
+  ],
+  "summary": "commento finale in italiano semplice, max 3 frasi",
+  "tip": "un suggerimento pratico per migliorare"
+}`;
+
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1200,
+        messages: [{
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: selectedImageType, data: selectedImageB64 } },
+            { type: "text", text: prompt }
+          ]
+        }]
+      })
+    });
+    const data = await r.json();
+    const raw = data.content[0].text.trim().replace(/```json|```/g,'').trim();
+    const res = JSON.parse(raw);
+    load.style.display = 'none';
+    renderCorrection(res);
+    addXP(5); // XP per ogni correzione inviata
+  } catch(e) {
+    load.style.display = 'none';
+    result.innerHTML = `<div style="padding:16px;background:#2a0f0f;border-radius:12px;color:#f8a0a0;font-size:14px;">
+      ⚠️ Errore nell'analisi. Assicurati che la foto sia leggibile e riprova.</div>`;
+  }
+  btn.disabled = false;
+}
+
+function renderCorrection(res){
+  const result = document.getElementById('cam-result');
+  const verdictMap = {
+    corretto: { cls:'ok', icon:'✅', label:'Svolgimento corretto!' },
+    errori:   { cls:'ko', icon:'❌', label:'Trovati degli errori' },
+    parziale: { cls:'warn', icon:'⚠️', label:'Parzialmente corretto' }
+  };
+  const v = verdictMap[res.verdict] || verdictMap['parziale'];
+  const scoreColor = res.score >= 8 ? 'var(--green)' : res.score >= 6 ? 'var(--gold)' : 'var(--red)';
+
+  let stepsHtml = '';
+  if(res.steps && res.steps.length){
+    stepsHtml = res.steps.map(s =>
+      `<div class="corr-step ${s.status}">${s.status==='ok'?'✓':s.status==='ko'?'✗':'💡'} ${esc(s.text)}</div>`
+    ).join('');
+  }
+
+  result.innerHTML = `
+    <div class="correction-card ${v.cls}">
+      <div class="corr-header">
+        <div class="corr-icon">${v.icon}</div>
+        <div>
+          <div class="corr-title">${v.label}</div>
+          <div style="font-size:12px;color:var(--muted)">${esc(res.exercise||'')}</div>
+        </div>
+        <div style="margin-left:auto;font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:${scoreColor}">${res.score}/10</div>
+      </div>
+      <div class="corr-body">${stepsHtml}</div>
+    </div>
+    <div class="correction-card">
+      <div class="corr-header"><div class="corr-icon">💬</div><div class="corr-title">Commento</div></div>
+      <div class="corr-body">${esc(res.summary||'')}</div>
+    </div>
+    <div class="correction-card warn">
+      <div class="corr-header"><div class="corr-icon">💡</div><div class="corr-title">Suggerimento</div></div>
+      <div class="corr-body">${esc(res.tip||'')}</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="ln-btn ln-ghost" style="flex:1" onclick="resetCamera()">📷 Nuova foto</button>
+      <button class="ln-btn ln-primary" style="flex:1" onclick="goP('tutor')">💬 Chiedi al tutor</button>
+    </div>
+  `;
+  document.getElementById('main-scroll').scrollTop = 9999;
+}
+</script>
+
+</body>
+</html>
